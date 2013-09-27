@@ -2,7 +2,7 @@
 <project name="Eclat" default="main">
 	
 	<description>
-		Hadoop Eclat implementation by Sandy Moens and Emin Akserhirli
+		Hadoop Eclat implementation by Sandy Moens and Emin Aksehirli
 	</description>
 	
 	<property name="src" location="src"/>
