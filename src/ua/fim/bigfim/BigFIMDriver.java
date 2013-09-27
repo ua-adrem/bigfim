@@ -75,7 +75,7 @@ public class BigFIMDriver extends Configured implements Tool {
 		config.printConfig();
 
 		String iFile = config.getInputFile();
-		String oFile = config.getOutputFile();
+		String oFile = config.getOutputDir();
 		cleanDirs(new String[] { oFile });
 		long start = System.currentTimeMillis();
 		long nrLines = startAprioriPhase(iFile, oFile, config);

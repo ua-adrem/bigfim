@@ -24,7 +24,7 @@ public class Config {
 	public static final String MIN_FREQ_KEY = "minfreq";
 	public static final String NUMBER_OF_LINES_KEY = "number_of_lines_read";
 	public static final String NUMBER_OF_MAPPERS_KEY = "number_of_mappers";
-	public static final String OUTPUT_FILE_KEY = "output_file";
+	public static final String OUTPUT_DIR_KEY = "output_dir";
 	public static final String PREFIX_LENGTH_KEY = "prefix_length";
 	public static final String WRITE_SETS_KEY = "write_sets";
 	public static final String SUBDB_SIZE = "sub_db_size";
@@ -61,7 +61,7 @@ public class Config {
 	}
 
 	public boolean isValid() {
-		return !getInputFile().equals("") && !getOutputFile().equals("")
+		return !getInputFile().equals("") && !getOutputDir().equals("")
 				&& (getMinSup() != -1 || getMinFreq() != -1);
 	}
 
@@ -95,8 +95,8 @@ public class Config {
 		return Integer.parseInt(props.getProperty(NUMBER_OF_MAPPERS_KEY, "1"));
 	}
 
-	public String getOutputFile() {
-		return props.getProperty(OUTPUT_FILE_KEY, "");
+	public String getOutputDir() {
+		return props.getProperty(OUTPUT_DIR_KEY, "");
 	}
 
 	public long getMapredTaskTimeout() {

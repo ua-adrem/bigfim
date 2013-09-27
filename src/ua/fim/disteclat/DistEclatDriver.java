@@ -105,14 +105,14 @@ public class DistEclatDriver extends Configured implements Tool {
 		}
 		config.printConfig();
 
-		String tmpDir1 = config.getOutputFile() + separator + "tmp1";
-		String tmpDir2 = config.getOutputFile() + separator + "tmp2";
+		String tmpDir1 = config.getOutputDir() + separator + "tmp1";
+		String tmpDir2 = config.getOutputDir() + separator + "tmp2";
 
 		long start = System.currentTimeMillis();
-		cleanDirs(new String[] { config.getOutputFile(), tmpDir1, tmpDir2 });
+		cleanDirs(new String[] { config.getOutputDir(), tmpDir1, tmpDir2 });
 		startItemReading(config.getInputFile(), tmpDir1, config);
 		startPrefixComputation(tmpDir1, tmpDir2, config);
-		startMining(tmpDir2, config.getOutputFile(), config);
+		startMining(tmpDir2, config.getOutputDir(), config);
 		long end = System.currentTimeMillis();
 
 		System.out
