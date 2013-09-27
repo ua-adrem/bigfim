@@ -31,11 +31,6 @@ public class FimDriver {
 			return;
 		}
 
-		if (args[0].equalsIgnoreCase(HELP)) {
-			printConfigurationHelp();
-			return;
-		}
-
 		Config config = new Config();
 		config.readConfig(args[0]);
 
@@ -54,7 +49,7 @@ public class FimDriver {
 			break;
 		}
 		default: {
-			System.out.println("Illegal version specified!");
+			System.out.println("Invalid version specified!");
 			printHelp();
 		}
 		}
@@ -62,10 +57,6 @@ public class FimDriver {
 
 	private static void printHelp() {
 		System.out.println("Please specify: [configFile]");
-		System.out.println("For more information on config file type 'help'");
-	}
-
-	private static void printConfigurationHelp() {
-		System.out.println("TODO");
+		System.out.println("For more information on config file please check example folder.");
 	}
 }
