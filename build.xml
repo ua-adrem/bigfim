@@ -69,6 +69,7 @@
 	<target name="clean" description="clean up">
 		<delete dir="${build}" />
 		<delete dir="${dist}" />
+		<delete file="${software}-${fullversion}.jar" />
 	</target>
 	
 	<target name="cleanAfter" description="clean up after distribution">
