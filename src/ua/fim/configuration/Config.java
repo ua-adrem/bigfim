@@ -109,7 +109,7 @@ public class Config {
 	}
 
 	public boolean getWriteSets() {
-		return Boolean.parseBoolean(props.getProperty(WRITE_SETS_KEY, "false"));
+		return Boolean.parseBoolean(props.getProperty(WRITE_SETS_KEY, "true"));
 	}
 
 }
