@@ -19,8 +19,6 @@ public class FimDriver {
    * ========================================================================
    */
   
-  private static final String HELP = "HELP";
-  
   public static enum FimVersion {
     DISTECLAT, BIGFIM
   }
