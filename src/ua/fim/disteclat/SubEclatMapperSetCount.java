@@ -30,7 +30,7 @@ public class SubEclatMapperSetCount extends SubEclatMapperBase<LongWritable,Text
    */
   
   @Override
-  public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
+  public void map(LongWritable key, Text value, Context context) {
     StringTokenizer st = new StringTokenizer(value.toString());
     st.nextToken();
     

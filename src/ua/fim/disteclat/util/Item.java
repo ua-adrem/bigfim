@@ -1,9 +1,9 @@
 package ua.fim.disteclat.util;
 
 public class Item {
-  public String name;
+  public final String name;
   private final int support;
-  protected int[] tids;
+  protected final int[] tids;
   
   public Item(String name, int support, int[] tids) {
     this.name = name;

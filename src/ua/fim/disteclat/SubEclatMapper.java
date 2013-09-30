@@ -1,5 +1,7 @@
 package ua.fim.disteclat;
 
+import static ua.fim.disteclat.util.Utils.getGroupString;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -9,7 +11,6 @@ import org.apache.hadoop.io.Text;
 
 import ua.fim.disteclat.util.PrefixGroupReporter.Extension;
 import ua.fim.disteclat.util.SetReporter;
-import ua.fim.disteclat.util.Utils;
 
 /**
  * This class implements the Mapper for the third MapReduce cycle for Dist-Eclat. It receives a list of prefixes that
@@ -35,16 +36,19 @@ public class SubEclatMapper extends SubEclatMapperBase<LongWritable,Text,Text,Te
     
     int i = 0;
     int prefixes = st.countTokens();
+    
     while (st.hasMoreElements()) {
       SetReporter reporter = new SetReporter.HadoopTreeStringReporter(context);
       EclatMiner miner = new EclatMiner();
       miner.setSetReporter(reporter);
       String item = st.nextToken();
       
-      String group = Utils.getGroupString(item);
+      String group = getGroupString(item);
       List<Extension> extensions = prefixesGroups.get(group);
       long beg = System.currentTimeMillis();
+      
       miner.mine(extensions, singletons, singletonsIndexMap, item, minSup);
+      
       long time = System.currentTimeMillis() - beg;
       this.time += time;
       i++;

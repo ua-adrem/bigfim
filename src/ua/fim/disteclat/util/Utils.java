@@ -72,6 +72,7 @@ public class Utils {
         String[] ext = extension.split(DELIMITER_SUPPORT);
         Extension oExt = new Extension(ext[0]);
         if (extension == last) {
+          // FIXME: Can be taken out of the loop!
           String[] split = ext[1].split("\\" + DELIMITER_SUBEXTENSIONSLIST);
           if (split.length == 2) {
             for (String subExtension : split[1].split("\\" + DELIMITER_SUBEXTENSIONS)) {

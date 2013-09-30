@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -77,9 +76,9 @@ public class EclatMiner {
     this.pgReporter = pgReporter;
   }
   
-  public int mine(java.util.Map<String,Integer> indices, List<Item> bitSets, String string, int minSup) {
+  public int mine(Map<String,Integer> indices, List<Item> bitSets, String prefix, int minSup) {
     long beg = System.currentTimeMillis();
-    String[] items = string.split("_");
+    String[] items = prefix.split("_");
     
     Item item = bitSets.get(indices.get(items[0]));
     int[] tids = item.getTids();
@@ -162,10 +161,10 @@ public class EclatMiner {
   }
   
   public int mine(List<Extension> extensions, List<Item> singletons, Map<String,Integer> singletonsIndexMap,
-      String string, int minSup) {
+      String prefix, int minSup) {
     long beg = System.currentTimeMillis();
     
-    String[] items = string.split("_");
+    String[] items = prefix.split("_");
     
     int[] tids = null;
     StringBuilder itemName = new StringBuilder();
@@ -237,87 +236,20 @@ public class EclatMiner {
         for (Item anItem : curr) {
           builder.append(anItem.name + "_");
         }
-        List<Extension> exts = new LinkedList<Extension>();
+        List<Extension> extensionss = new LinkedList<Extension>();
         for (Iterator<Item> nIt = diffSets.iterator(); nIt.hasNext();) {
           Item newItem = nIt.next();
-          Extension ext = new Extension(newItem.name);
-          ext.setSupport(newItem.freq());
+          Extension extention = new Extension(newItem.name);
+          extention.setSupport(newItem.freq());
           if (closureCheck(sup, newItem)) {
             while (nIt.hasNext()) {
-              ext.addSubExtension(nIt.next().name);
+              extention.addSubExtension(nIt.next().name);
             }
           }
-          exts.add(ext);
+          extensionss.add(extention);
         }
         pgReporter.report(builder.toString(), extensions);
       }
-    }
-    
-    return found;
-  }
-  
-  public int mineNonRec(List<Extension> extensions, List<Item> singletons, Map<String,Integer> singletonsIndexMap,
-      String string, int minSup) {
-    long beg = System.currentTimeMillis();
-    
-    String[] items = string.split("_");
-    
-    int[] tids = null;
-    StringBuilder itemName = new StringBuilder();
-    for (String i : items) {
-      int ix = singletonsIndexMap.get(i);
-      Item item = singletons.get(ix);
-      itemName.append(i + " ");
-      if (tids == null) {
-        tids = Arrays.copyOf(item.getTids(), item.getTids().length);
-      } else {
-        tids = intersect(tids, item.getTids());
-      }
-    }
-    
-    Item item = new Item(itemName.toString().trim(), tids.length, tids);
-    LinkedList<Item> curr = new LinkedList<Item>(Collections.singleton(item));
-    int sup = item.freq();
-    int found = 0;
-    
-    if (sup >= minSup && curr.size() >= minSize && curr.size() <= maxSize) {
-      reporter.report(curr, sup, item.getTids());
-      found++;
-    }
-    
-    // go down the tree if max size not yet reached
-    if (curr.size() < maxSize) {
-      int index = indexOf(extensions, items[items.length - 1]);
-      ArrayList<Item> diffSets = new ArrayList<Item>(singletons.size() - index);
-      ListIterator<Extension> it = extensions.listIterator(index + 1);
-      Extension extension;
-      while (it.hasNext()) {
-        extension = it.next();
-        String nextItemName = extension.getName();
-        Item nextItem = singletons.get(singletonsIndexMap.get(nextItemName));
-        int[] diffSet = Utils.setDifference(item, nextItem);
-        if (sup - diffSet.length >= minSup) {
-          diffSets.add(new Item(nextItem.name, sup - diffSet.length, diffSet));
-        }
-      }
-      extension = extensions.get(extensions.size() - 1);
-      List<String> subExtensions = extension.getSubExtensions();
-      for (String subExtension : subExtensions) {
-        Item nextItem = singletons.get(singletonsIndexMap.get(subExtension));
-        int[] diffSet = Utils.setDifference(item, nextItem);
-        if (sup - diffSet.length >= minSup) {
-          diffSets.add(new Item(nextItem.name, sup - diffSet.length, diffSet));
-        }
-      }
-      
-      setupCost += System.currentTimeMillis() - beg;
-      beg = System.currentTimeMillis();
-      
-      LinkedList<State> queue = new LinkedList<State>();
-      queue.add(new State(sup, curr, diffSets));
-      declatNonRec(queue, minSup);
-      
-      recursiveCost += System.currentTimeMillis() - beg;
     }
     
     return found;
@@ -424,63 +356,6 @@ public class EclatMiner {
       this.prefix = nPrefix;
       this.items = items;
     }
-  }
-  
-  private int declatNonRec(Deque<State> queue, int minSup) {
-    int found = 0;
-    while (!queue.isEmpty()) {
-      // get a proper state
-      State state = queue.pollLast();
-      int currSup = state.currSup;
-      List<Item> prefix = state.prefix;
-      List<Item> items = state.items;
-      
-      // process each single item as new prefix
-      Iterator<Item> it1 = items.iterator();
-      for (int i = 0; i < items.size(); i++) {
-        Item item = it1.next();
-        int sup = currSup - item.getTids().length;
-        
-        if (prefix.size() < maxSize) {
-          // closure check, don't report current if closed superset
-          // exists
-          boolean report = true;
-          
-          List<Item> nItems = new ArrayList<Item>();
-          ListIterator<Item> it2 = items.listIterator(i + 1);
-          while (it2.hasNext()) {
-            Item nItem = it2.next();
-            int[] nTids;
-            nTids = Utils.setDifference(nItem, item);
-            int supOf = nTids.length;
-            int nSup = sup - supOf;
-            if (nSup >= minSup) {
-              nItems.add(new Item(nItem.name, nSup, nTids));
-              
-              // closed superset
-              if (supOf == 0) {
-                report &= false;
-              }
-            }
-          }
-          List<Item> nPrefix = new LinkedList<Item>(prefix);
-          nPrefix.add(item);
-          queue.add(new State(sup, nPrefix, nItems));
-          
-          report &= (sup >= minSup && prefix.size() >= minSize && prefix.size() < maxSize);
-          if (report) {
-            found++;
-            reporter.report(nPrefix, sup, item.getTids());
-          }
-        }
-        
-        // if closed, we can skip all subsequent branches
-        if (closureCheck(currSup, item)) {
-          break;
-        }
-      }
-    }
-    return found;
   }
   
   private static List<Item> readSingletons(Configuration conf, Path path) throws IOException, URISyntaxException {
