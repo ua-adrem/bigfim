@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.hadoop.io.IntWritable;
@@ -136,7 +138,7 @@ public interface SetReporter {
   public static class HadoopPerLevelCountReporter implements SetReporter {
     
     private final Context context;
-    Map<Integer,AtomicLong> counts = new HashMap<Integer,AtomicLong>();
+    ConcurrentMap<Integer,AtomicLong> counts = new ConcurrentHashMap<Integer,AtomicLong>();
     
     public HadoopPerLevelCountReporter(Context context) {
       this.context = context;
@@ -149,11 +151,12 @@ public interface SetReporter {
     
     @Override
     public void report(List<Item> itemset, int support) {
+      
       int size = itemset.size();
-      AtomicLong count = counts.get(size);
+      
+      AtomicLong count = counts.putIfAbsent(size, new AtomicLong());
       if (count == null) {
-        count = new AtomicLong();
-        counts.put(size, count);
+        count = counts.get(size);
       }
       count.incrementAndGet();
     }
