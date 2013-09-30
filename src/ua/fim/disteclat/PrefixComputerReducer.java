@@ -29,8 +29,7 @@ import org.apache.hadoop.mapreduce.lib.output.MultipleOutputs;
 
 import ua.fim.disteclat.util.PrefixDistribution;
 import ua.fim.disteclat.util.PrefixGroupReporter;
-
-import com.google.common.primitives.Ints;
+import ua.util.Tools;
 
 /**
  * This class implements the Reducer for the second MapReduce cycle for
@@ -282,7 +281,7 @@ public class PrefixComputerReducer extends
 			public int compare(ItemPair o1, ItemPair o2) {
 				int sup1 = o1.support;
 				int sup2 = o2.support;
-				return Ints.compare(sup1, sup2);
+				return Tools.compare(sup1, sup2);
 			}
 		});
 		return items;

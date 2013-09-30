@@ -55,7 +55,6 @@
 				<attribute name="Implementation-Title" value="${title}"/>	
 				<attribute name="Implementation-Version" value="build${bugfix-build}"/>
 			</manifest>
-            <zipgroupfileset dir="${lib}" includes="guava*.jar"/>
 		</jar>
 	</target>
 	

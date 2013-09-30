@@ -16,14 +16,12 @@ import ua.fim.bigfim.util.Item;
 import ua.fim.bigfim.util.SetReporter;
 import ua.util.Tools;
 
-import com.google.common.primitives.Ints;
-
 public class EclatMiner {
 
 	public static class AscendingItemComparator implements Comparator<Item> {
 		@Override
 		public int compare(Item o1, Item o2) {
-			return Ints.compare(o1.freq(), o2.freq());
+			return Tools.compare(o1.freq(), o2.freq());
 		}
 	}
 

@@ -10,8 +10,7 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.lib.output.MultipleOutputs;
 
 import ua.fim.disteclat.PrefixComputerReducer.ItemPair;
-
-import com.google.common.primitives.Ints;
+import ua.util.Tools;
 
 /**
  * Interface for different prefix distribution implementations. A distribution
@@ -38,7 +37,7 @@ public interface PrefixDistribution {
 			Collections.sort(prefixes, new Comparator<ItemPair>() {
 				@Override
 				public int compare(ItemPair o1, ItemPair o2) {
-					return -Ints.compare(o1.getSupport(), o2.getSupport());
+					return -Tools.compare(o1.getSupport(), o2.getSupport());
 				}
 			});
 		}
@@ -101,7 +100,7 @@ public interface PrefixDistribution {
 					while (comp == 0 && ix < o1.items.length) {
 						int ii1Sup = supMap.get(o1.items[ix]);
 						int ii2Sup = supMap.get(o2.items[ix]);
-						comp = Ints.compare(ii1Sup, ii2Sup);
+						comp = Tools.compare(ii1Sup, ii2Sup);
 						ix++;
 					}
 					return comp;
