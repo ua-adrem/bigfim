@@ -10,11 +10,10 @@ import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
  * 
  * @author Sandy Moens & Emin Aksehirli
  */
-public class NoSplitSequenceFileInputFormat extends
-		SequenceFileInputFormat<Text, IntArrayWritable> {
-
-	@Override
-	public boolean isSplitable(JobContext jc, Path p) {
-		return false;
-	}
+public class NoSplitSequenceFileInputFormat extends SequenceFileInputFormat<Text,IntArrayWritable> {
+  
+  @Override
+  public boolean isSplitable(JobContext jc, Path p) {
+    return false;
+  }
 }
