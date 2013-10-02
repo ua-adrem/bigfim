@@ -1,6 +1,7 @@
 package ua.fim.disteclat;
 
 import static java.util.Collections.singletonList;
+import static java.util.Collections.unmodifiableList;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -58,7 +59,7 @@ public class EclatMinerTest {
     final Object[][] expecteds = new Object[][] { {"5", 11}, {"5 9", 5}, {"5 8 9", 5}};
     assertEqual(expecteds, reporter.itemsets);
   }
-
+  
   @Test
   public void Conditional_Database_Can_Be_Longer_Than_1_Item() {
     
@@ -66,10 +67,10 @@ public class EclatMinerTest {
     
     final CollectReporter reporter = mineFor("5_8", 5);
     
-    final Object[][] expecteds = new Object[][] {{"5 8", 5}, {"5 8 9", 5}};
+    final Object[][] expecteds = new Object[][] { {"5 8", 5}, {"5 8 9", 5}};
     assertEqual(expecteds, reporter.itemsets);
   }
-
+  
   @Test
   public void Only_Checks_For_The_Items_With_Greater_Index() {
     
@@ -80,26 +81,35 @@ public class EclatMinerTest {
     final Object[][] expecteds = new Object[][] {{"5 9", 5}};
     assertEqual(expecteds, reporter.itemsets);
   }
-
+  
+  @Test
+  public void Checks_For_Candidate_Items() {
+    
+    prepareData_5();
+    
+    List<Extension> extensions = new ArrayList<Extension>();
+    
+    extensions.add(newExtension("2", 9));
+    extensions.add(newExtension("7", 8));
+    
+    final CollectReporter reporter = mineFor(extensions, "1_2", 5);
+    
+    final Object[][] expecteds = new Object[][] { {"1 2", 9}, {"1 2 7", 8}};
+    assertEqual(expecteds, reporter.itemsets);
+  }
+  
   @Test
   public void Only_Checks_For_The_Candidate_Items() {
     
     prepareData_5();
     
-    Extension extension = new Extension("2");
-    extension.setSupport(9);
+    final List<Extension> extensions = singletonList(newExtension("2", 9));
     
-    EclatMiner miner = new EclatMiner();
-    final CollectReporter reporter1 = new CollectReporter();
-    miner.setSetReporter(reporter1);
-    miner.mine(singletonList(extension), oneToOne, items, "1", 5);
+    final CollectReporter reporter = mineFor(extensions, "1_2", 5);
     
-    final CollectReporter reporter = reporter1;
-    
-    final Object[][] expecteds = new Object[][] {{"1 2", 5}};
+    final Object[][] expecteds = new Object[][] {{"1 2", 9}};
     assertEqual(expecteds, reporter.itemsets);
   }
-
   
   private void prepareData_5() {
     numOfItems = 10;
@@ -115,10 +125,20 @@ public class EclatMinerTest {
     return reporter;
   }
   
+  private CollectReporter mineFor(List<Extension> extensions, final String prefix, final int minSup) {
+    EclatMiner miner = new EclatMiner();
+    final CollectReporter reporter1 = new CollectReporter();
+    miner.setSetReporter(reporter1);
+    miner.mine(extensions, oneToOne, items, prefix, minSup);
+    
+    final CollectReporter reporter = reporter1;
+    return reporter;
+  }
+
   private static void assertEqual(final Object[][] expecteds, final List<Object[]> actualItemsets) {
     nextExpected: for (Object[] expected : expecteds) {
-      for (Iterator it = actualItemsets.iterator(); it.hasNext();) {
-        Object[] pair = (Object[]) it.next();
+      for (Iterator<Object[]> it = actualItemsets.iterator(); it.hasNext();) {
+        Object[] pair = it.next();
         
         List<Item> itemset = (List<Item>) pair[0];
         Integer support = (Integer) pair[1];
@@ -137,6 +157,12 @@ public class EclatMinerTest {
     assertTrue("There more itemsets then expected!", actualItemsets.isEmpty());
   }
   
+  private static Extension newExtension(final String name, final int support) {
+    Extension extension = new Extension(name);
+    extension.setSupport(support);
+    return extension;
+  }
+
   private static String itemsetToStr(List<Item> itemset) {
     String str = "";
     for (Item item : itemset) {
@@ -203,6 +229,8 @@ public class EclatMinerTest {
     }
     
     @Override
-    public void close() {}
+    public void close() {
+      itemsets = unmodifiableList(itemsets);
+    }
   }
 }
