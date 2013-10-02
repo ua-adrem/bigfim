@@ -9,7 +9,6 @@ import java.util.List;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.Mapper;
@@ -18,16 +17,18 @@ import ua.fim.bigfim.util.Item;
 import ua.fim.bigfim.util.SetReporter;
 import ua.hadoop.util.IntArrayWritable;
 
-public class EclatMinerSetCountMapper extends Mapper<IntArrayWritable,IntArrayWritable,Text,LongWritable> {
-  
-  private Text key;
-  private IntArrayWritable iaw;
-  private IntWritable[] iw;
+public abstract class EclatMinerMapperBase<VALUEOUT> extends Mapper<IntArrayWritable,IntArrayWritable,Text,VALUEOUT> {
   
   private int minSup;
   
+  protected abstract SetReporter getReporter(Context context);
+  
   int[] prefix;
   List<Item> items;
+  
+  public EclatMinerMapperBase() {
+    super();
+  }
   
   @Override
   public void setup(Context context) throws IOException {
@@ -48,8 +49,7 @@ public class EclatMinerSetCountMapper extends Mapper<IntArrayWritable,IntArrayWr
       mineSubTree(context);
       prefix = null;
       items.clear();
-    }
-    if (valueWritables.length == 0) {
+    } else if (valueWritables.length == 0) {
       prefix = new int[keyWritables.length];
       int i = 0;
       for (Writable w : keyWritables) {
@@ -72,7 +72,7 @@ public class EclatMinerSetCountMapper extends Mapper<IntArrayWritable,IntArrayWr
   }
   
   private void mineSubTree(Context context) {
-    if (prefix == null) {
+    if (prefix == null || prefix.length == 0) {
       return;
     }
     Collections.sort(items, new EclatMiner.AscendingItemComparator());
@@ -85,9 +85,10 @@ public class EclatMinerSetCountMapper extends Mapper<IntArrayWritable,IntArrayWr
     builder.append("#items: " + items.size());
     System.out.println(builder.toString());
     EclatMiner miner = new EclatMiner();
-    SetReporter.HadoopPerLevelCountReporter reporter = new SetReporter.HadoopPerLevelCountReporter(context);
+    SetReporter reporter = getReporter(context);
     miner.setSetReporter(reporter);
     miner.mineRec(prefix, items, minSup);
     reporter.close();
   }
+  
 }

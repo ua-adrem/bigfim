@@ -41,6 +41,10 @@ import org.apache.hadoop.util.ToolRunner;
 
 import ua.fim.configuration.Config;
 import ua.fim.disteclat.DistEclatDriver;
+import ua.fim.disteclat.SubEclatMapper;
+import ua.fim.disteclat.SubEclatMapperSetCount;
+import ua.fim.disteclat.SubEclatReducer;
+import ua.fim.disteclat.SubEclatReducerSetCount;
 import ua.hadoop.util.IntArrayWritable;
 import ua.hadoop.util.NoSplitSequenceFileInputFormat;
 import ua.hadoop.util.SplitByNumberOfMappersTextInputFormat;
@@ -243,10 +247,16 @@ public class BigFIMDriver extends Configured implements Tool {
     job.setJarByClass(BigFIMDriver.class);
     
     job.setOutputKeyClass(Text.class);
-    job.setOutputValueClass(LongWritable.class);
     
-    job.setMapperClass(EclatMinerSetCountMapper.class);
-    job.setReducerClass(EclatMinerSetCountReducer.class);
+    if (config.getWriteSets()) {
+      job.setOutputValueClass(Text.class);
+      job.setMapperClass(EclatMinerMapper.class);
+      job.setReducerClass(EclatMinerReducer.class);
+    } else {
+      job.setOutputValueClass(LongWritable.class);
+      job.setMapperClass(EclatMinerMapperSetCount.class);
+      job.setReducerClass(EclatMinerReducerSetCount.class);
+    }
     
     job.setInputFormatClass(NoSplitSequenceFileInputFormat.class);
     job.setOutputFormatClass(SequenceFileOutputFormat.class);
