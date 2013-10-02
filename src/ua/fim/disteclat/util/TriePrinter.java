@@ -3,6 +3,7 @@ package ua.fim.disteclat.util;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintStream;
 
 public class TriePrinter {
   public static final char SYMBOL = '$';
@@ -10,6 +11,8 @@ public class TriePrinter {
   public static final char OPENSUP = '(';
   public static final char CLOSESUP = ')';
   
+  static PrintStream out = System.out;
+
   public static void printAsSets(String trieString) {
     StringBuilder itemsetBuilder = new StringBuilder();
     StringBuilder supportBuilder = new StringBuilder();
@@ -18,7 +21,7 @@ public class TriePrinter {
       char c = trieString.charAt(i);
       if (c == SYMBOL) {
         if (itemsetBuilder.length() == 0) {
-          System.out.println("already 0");
+          out.println("already 0");
         } else {
           itemsetBuilder.setLength(itemsetBuilder.length() - 1);
           int newLength = itemsetBuilder.lastIndexOf(" ") + 1;
@@ -30,8 +33,8 @@ public class TriePrinter {
         readSupport = true;
         itemsetBuilder.append(' ');
       } else if (c == CLOSESUP) {
-        System.out.print(itemsetBuilder.toString());
-        System.out.println("(" + supportBuilder.toString() + ")");
+        out.print(itemsetBuilder.toString());
+        out.println("(" + supportBuilder.toString() + ")");
         supportBuilder.setLength(0);
         readSupport = false;
       } else {
