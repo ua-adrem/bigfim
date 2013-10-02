@@ -1,5 +1,6 @@
 package ua.fim.disteclat;
 
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -12,6 +13,7 @@ import java.util.Map;
 import org.junit.Test;
 
 import ua.fim.disteclat.util.Item;
+import ua.fim.disteclat.util.PrefixGroupReporter.Extension;
 import ua.fim.disteclat.util.SetReporter;
 
 public class EclatMinerTest {
@@ -56,6 +58,48 @@ public class EclatMinerTest {
     final Object[][] expecteds = new Object[][] { {"5", 11}, {"5 9", 5}, {"5 8 9", 5}};
     assertEqual(expecteds, reporter.itemsets);
   }
+
+  @Test
+  public void Conditional_Database_Can_Be_Longer_Than_1_Item() {
+    
+    prepareData_5();
+    
+    final CollectReporter reporter = mineFor("5_8", 5);
+    
+    final Object[][] expecteds = new Object[][] {{"5 8", 5}, {"5 8 9", 5}};
+    assertEqual(expecteds, reporter.itemsets);
+  }
+
+  @Test
+  public void Only_Checks_For_The_Items_With_Greater_Index() {
+    
+    prepareData_5();
+    
+    final CollectReporter reporter = mineFor("5_9", 5);
+    
+    final Object[][] expecteds = new Object[][] {{"5 9", 5}};
+    assertEqual(expecteds, reporter.itemsets);
+  }
+
+  @Test
+  public void Only_Checks_For_The_Candidate_Items() {
+    
+    prepareData_5();
+    
+    Extension extension = new Extension("2");
+    extension.setSupport(9);
+    
+    EclatMiner miner = new EclatMiner();
+    final CollectReporter reporter1 = new CollectReporter();
+    miner.setSetReporter(reporter1);
+    miner.mine(singletonList(extension), oneToOne, items, "1", 5);
+    
+    final CollectReporter reporter = reporter1;
+    
+    final Object[][] expecteds = new Object[][] {{"1 2", 5}};
+    assertEqual(expecteds, reporter.itemsets);
+  }
+
   
   private void prepareData_5() {
     numOfItems = 10;
