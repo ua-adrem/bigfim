@@ -1,6 +1,7 @@
 package ua.fim.disteclat.util;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -12,7 +13,7 @@ public class TriePrinter {
   public static final char CLOSESUP = ')';
   
   static PrintStream out = System.out;
-
+  
   public static void printAsSets(String trieString) {
     StringBuilder itemsetBuilder = new StringBuilder();
     StringBuilder supportBuilder = new StringBuilder();
@@ -48,7 +49,17 @@ public class TriePrinter {
   }
   
   public static void main(String[] args) throws IOException {
-    BufferedReader reader = new BufferedReader(new FileReader("mam-tids/fis/part-r-00000"));
+    if (args.length == 0) {
+      System.out.println("Usage: TriePrinter encoded-input-file [output-file]");
+      System.out.println("\nIf the output file is not given, standart output will be used.");
+      return;
+    }
+    
+    if (args.length > 1) {
+      TriePrinter.out = new PrintStream(new File(args[1]));
+    }
+    
+    BufferedReader reader = new BufferedReader(new FileReader(args[0]));
     String line;
     while ((line = reader.readLine()) != null) {
       TriePrinter.printAsSets(line);
