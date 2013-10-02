@@ -49,12 +49,12 @@ It will run for a while. Get the frequent itemsets:
 
     $HADOOP_PREFIX/bin/hadoop fs -get output/sample-60-3 . 
    
-The file `sample-800-10-3/fis/part-r-00000` lists all the frequent itemsets.
+The file `sample-60-3/fis/part-r-00000` lists all the frequent itemsets.
 Please note that the file is encoded for compression. To decode the file and 
 write all the individual frequent itemsets to `/tmp/out.txt` use the following 
 command:
 
-    java -cp ../bigfim.0.1.jar ua.fim.disteclat.util.TriePrinter output/sample-800-10-3/fis/part-r-00000 /tmp/out.txt
+    java -cp ../bigfim.0.1.jar ua.fim.disteclat.util.TriePrinter output/sample-60-3/fis/part-r-00000 /tmp/out.txt
  
 For the format of the output please refer to the project [wiki][wiki].
 

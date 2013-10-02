@@ -50,6 +50,11 @@ public class AprioriPhaseMapper extends Mapper<LongWritable,Text,Text,IntWritabl
     public void incrementSupport() {
       this.support++;
     }
+    
+    @Override
+    public String toString() {
+      return "[" + id + "(" + support + "):" + children + "]";
+    }
   }
   
   private static final String ItemDelimiter = " ";

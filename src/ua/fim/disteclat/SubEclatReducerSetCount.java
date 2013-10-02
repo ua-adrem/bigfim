@@ -18,14 +18,6 @@ import org.apache.hadoop.mapreduce.Reducer;
  */
 public class SubEclatReducerSetCount extends Reducer<Text,LongWritable,Text,LongWritable> {
   
-  /*
-   * ========================================================================
-   * 
-   * NON-STATIC
-   * 
-   * ========================================================================
-   */
-  
   private long total = 0;
   private int prefixLength;
   
@@ -38,10 +30,9 @@ public class SubEclatReducerSetCount extends Reducer<Text,LongWritable,Text,Long
   
   @Override
   public void reduce(Text key, Iterable<LongWritable> values, Context context) throws IOException, InterruptedException {
-    Iterator<LongWritable> it = values.iterator();
     long levelTotal = 0;
-    while (it.hasNext()) {
-      levelTotal += it.next().get();
+    for (LongWritable lw : values) {
+      levelTotal += lw.get();
     }
     total += levelTotal;
     int theLevel = prefixLength - 1 + (Integer.parseInt(key.toString()));

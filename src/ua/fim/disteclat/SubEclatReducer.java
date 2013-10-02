@@ -1,7 +1,6 @@
 package ua.fim.disteclat;
 
 import java.io.IOException;
-import java.util.Iterator;
 
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
@@ -14,23 +13,14 @@ import org.apache.hadoop.mapreduce.Reducer;
  */
 public class SubEclatReducer extends Reducer<Text,Text,Text,Text> {
   
-  /*
-   * ========================================================================
-   * 
-   * NON-STATIC
-   * 
-   * ========================================================================
-   */
-  
   private long setsFound = 0;
   
   @Override
   public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
-    Iterator<Text> it = values.iterator();
     long numberOfSets = Long.parseLong(key.toString());
-    while (it.hasNext()) {
+    for (Text item : values) {
       setsFound += numberOfSets;
-      context.write(key, it.next());
+      context.write(key, item);
     }
   }
   

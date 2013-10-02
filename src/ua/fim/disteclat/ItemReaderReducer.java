@@ -137,18 +137,19 @@ public class ItemReaderReducer extends Reducer<Text,IntArrayWritable,Text,Writab
   private void writeSingletonsDistribution(List<String> sortedSingletons) throws IOException, InterruptedException {
     int end = Math.min(numberOfMappers, sortedSingletons.size());
     
-    Text key = new Text();
-    Text value = new Text();
+    Text mapperId = new Text();
+    Text assignedItems = new Text();
     
+    // Round robin assignment
     for (int ix = 0; ix < end; ix++) {
       StringBuilder builder = new StringBuilder();
       for (int ix1 = ix; ix1 < sortedSingletons.size(); ix1 += numberOfMappers) {
         builder.append(sortedSingletons.get(ix1) + " ");
       }
       
-      key.set("" + ix);
-      value.set(builder.substring(0, builder.length() - 1));
-      mos.write(OSingletonsDistribution, key, value);
+      mapperId.set("" + ix);
+      assignedItems.set(builder.substring(0, builder.length() - 1));
+      mos.write(OSingletonsDistribution, mapperId, assignedItems);
     }
   }
 }
