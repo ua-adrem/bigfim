@@ -51,6 +51,8 @@ public class EclatMiner {
   
   private long setupCost = 0;
   private long recursiveCost = 0;
+  private Map<String,Integer> indices;
+  private List<Item> singletons;
   
   public long getSetupCost() {
     return setupCost;
@@ -76,20 +78,23 @@ public class EclatMiner {
     this.pgReporter = pgReporter;
   }
   
-  public int mine(Map<String,Integer> indices, List<Item> bitSets, String prefix, int minSup) {
-    long beg = System.currentTimeMillis();
-    String[] items = prefix.split("_");
+  public int mine(Map<String,Integer> indices, List<Item> singletons, String prefix, int minSup) {
+    this.indices = indices;
+    this.singletons = singletons;
     
-    Item item = bitSets.get(indices.get(items[0]));
+    long beg = System.currentTimeMillis();
+    String[] itemset = prefix.split("_");
+    
+    Item item = singletons.get(indices.get(itemset[0]));
     int[] tids = item.getTids();
     StringBuffer itemName = new StringBuffer();
-    itemName.append(items[0]);
+    itemName.append(itemset[0]);
     LinkedList<Item> curr = new LinkedList<Item>(Collections.singleton(item));
     
-    for (int i = 1; i < items.length; i++) {
-      item = bitSets.get(indices.get(items[i]));
+    for (int i = 1; i < itemset.length; i++) {
+      item = singletons.get(indices.get(itemset[i]));
       tids = intersect(tids, item.getTids());
-      itemName.append(" " + items[i]);
+      itemName.append(" " + itemset[i]);
       curr.add(item);
     }
     
@@ -106,80 +111,84 @@ public class EclatMiner {
     }
     
     // go down the tree if max size not yet reached
-    if (curr.size() < maxSize) {
-      
-      int indexLastItem = indices.get(items[items.length - 1]);
-      ArrayList<Item> diffSets = new ArrayList<Item>(bitSets.size() - indexLastItem);
-      ListIterator<Item> it = bitSets.listIterator(indexLastItem + 1);
-      while (it.hasNext()) {
-        Item nextItem = it.next();
-        int[] diffSet;
-        diffSet = setDifference(item, nextItem);
-        if (sup - diffSet.length >= minSup) {
-          diffSets.add(new Item(nextItem.name, sup - diffSet.length, diffSet));
-        }
+    if (curr.size() >= maxSize) {
+      return found;
+    }
+    
+    int indexLastItem = indices.get(itemset[itemset.length - 1]);
+    ArrayList<Item> diffSets = new ArrayList<Item>(singletons.size() - indexLastItem);
+    ListIterator<Item> it = singletons.listIterator(indexLastItem + 1);
+    while (it.hasNext()) {
+      Item nextItem = it.next();
+      int[] diffSet;
+      diffSet = setDifference(item, nextItem);
+      if (sup - diffSet.length >= minSup) {
+        diffSets.add(new Item(nextItem.name, sup - diffSet.length, diffSet));
       }
-      
-      setupCost += System.currentTimeMillis() - beg;
-      
-      beg = System.currentTimeMillis();
-      
-      int i = 0;
-      for (Iterator<Item> dIt = diffSets.iterator(); dIt.hasNext(); i++) {
-        Item newItem = dIt.next();
-        found += declat(sup, curr, i, diffSets, minSup);
+    }
+    
+    setupCost += System.currentTimeMillis() - beg;
+    
+    beg = System.currentTimeMillis();
+    
+    int i = 0;
+    for (Iterator<Item> dIt = diffSets.iterator(); dIt.hasNext(); i++) {
+      Item newItem = dIt.next();
+      found += declat(sup, curr, i, diffSets, minSup);
+      if (closureCheck(sup, newItem)) {
+        break;
+      }
+    }
+    
+    recursiveCost += System.currentTimeMillis() - beg;
+    
+    if (curr.size() == maxSize - 1 && !diffSets.isEmpty()) {
+      // create prefixes list
+      StringBuilder builder = new StringBuilder();
+      for (Item anItem : curr) {
+        builder.append(anItem.name + "_");
+      }
+      List<Extension> extensions = new LinkedList<Extension>();
+      for (Iterator<Item> nIt = diffSets.iterator(); nIt.hasNext();) {
+        Item newItem = nIt.next();
+        Extension extension = new Extension(newItem.name);
+        extension.setSupport(newItem.freq());
         if (closureCheck(sup, newItem)) {
-          break;
-        }
-      }
-      
-      recursiveCost += System.currentTimeMillis() - beg;
-      
-      if (curr.size() == maxSize - 1 && !diffSets.isEmpty()) {
-        // create prefixes list
-        StringBuilder builder = new StringBuilder();
-        for (Item anItem : curr) {
-          builder.append(anItem.name + "_");
-        }
-        List<Extension> extensions = new LinkedList<Extension>();
-        for (Iterator<Item> nIt = diffSets.iterator(); nIt.hasNext();) {
-          Item newItem = nIt.next();
-          Extension extension = new Extension(newItem.name);
-          extension.setSupport(newItem.freq());
-          if (closureCheck(sup, newItem)) {
-            while (nIt.hasNext()) {
-              extension.addSubExtension(nIt.next().name);
-            }
+          while (nIt.hasNext()) {
+            extension.addSubExtension(nIt.next().name);
           }
-          extensions.add(extension);
         }
-        pgReporter.report(builder.toString(), extensions);
+        extensions.add(extension);
       }
+      pgReporter.report(builder.toString(), extensions);
     }
     
     return found;
   }
   
-  public int mine(List<Extension> extensions, List<Item> singletons, Map<String,Integer> singletonsIndexMap,
-      String prefix, int minSup) {
+  public int mine(List<Extension> candidates, Map<String,Integer> indices, List<Item> singletons, String prefix,
+      int minSup) {
+    
     long beg = System.currentTimeMillis();
     
-    String[] items = prefix.split("_");
+    String[] itemset = prefix.split("_");
     
-    int[] tids = null;
-    StringBuilder itemName = new StringBuilder();
-    for (String i : items) {
-      int ix = singletonsIndexMap.get(i);
-      Item item = singletons.get(ix);
-      itemName.append(i + " ");
-      if (tids == null) {
-        tids = Arrays.copyOf(item.getTids(), item.getTids().length);
-      } else {
-        tids = intersect(tids, item.getTids());
-      }
+    if (itemset.length == 0) {
+      return 0;
     }
     
-    Item item = new Item(itemName.toString().trim(), tids.length, tids);
+    Item first = singletons.get(indices.get(itemset[0]));
+    int[] tids = Arrays.copyOf(first.getTids(), first.getTids().length);
+    StringBuilder itemName = new StringBuilder(itemset[0] + " ");
+    
+    for (int ix = 1; ix < itemset.length; ix++) {
+      String i = itemset[ix];
+      Item item = singletons.get(indices.get(i));
+      itemName.append(i + " ");
+      tids = intersect(tids, item.getTids());
+    }
+    
+    Item item = new Item(itemName.substring(0, itemName.length() - 1), tids.length, tids);
     LinkedList<Item> curr = new LinkedList<Item>(Collections.singleton(item));
     int sup = item.freq();
     int found = 0;
@@ -192,64 +201,66 @@ public class EclatMiner {
     }
     
     // go down the tree if max size not yet reached
-    if (curr.size() < maxSize) {
-      int index = indexOf(extensions, items[items.length - 1]);
-      ArrayList<Item> diffSets = new ArrayList<Item>(singletons.size() - index);
-      ListIterator<Extension> it = extensions.listIterator(index + 1);
-      Extension extension;
-      while (it.hasNext()) {
-        extension = it.next();
-        String nextItemName = extension.getName();
-        Item nextItem = singletons.get(singletonsIndexMap.get(nextItemName));
-        int[] diffSet = Utils.setDifference(item, nextItem);
-        if (sup - diffSet.length >= minSup) {
-          diffSets.add(new Item(nextItem.name, sup - diffSet.length, diffSet));
-        }
+    if (curr.size() >= maxSize) {
+      return found;
+    }
+    
+    int index = indexOf(candidates, itemset[itemset.length - 1]);
+    ArrayList<Item> diffSets = new ArrayList<Item>(singletons.size() - index);
+    ListIterator<Extension> it = candidates.listIterator(index + 1);
+    Extension candidate;
+    while (it.hasNext()) {
+      candidate = it.next();
+      String nextItemName = candidate.getName();
+      Item nextItem = singletons.get(indices.get(nextItemName));
+      int[] diffSet = Utils.setDifference(item, nextItem);
+      if (sup - diffSet.length >= minSup) {
+        diffSets.add(new Item(nextItem.name, sup - diffSet.length, diffSet));
       }
-      extension = extensions.get(extensions.size() - 1);
-      List<String> subExtensions = extension.getSubExtensions();
-      for (String subExtension : subExtensions) {
-        Item nextItem = singletons.get(singletonsIndexMap.get(subExtension));
-        int[] diffSet = Utils.setDifference(item, nextItem);
-        if (sup - diffSet.length >= minSup) {
-          diffSets.add(new Item(nextItem.name, sup - diffSet.length, diffSet));
-        }
+    }
+    candidate = candidates.get(candidates.size() - 1);
+    List<String> subExtensions = candidate.getSubExtensions();
+    for (String subExtension : subExtensions) {
+      Item nextItem = singletons.get(indices.get(subExtension));
+      int[] diffSet = Utils.setDifference(item, nextItem);
+      if (sup - diffSet.length >= minSup) {
+        diffSets.add(new Item(nextItem.name, sup - diffSet.length, diffSet));
       }
-      
-      setupCost += System.currentTimeMillis() - beg;
-      beg = System.currentTimeMillis();
-      
-      int ix = 0;
-      for (Iterator<Item> dIt = diffSets.iterator(); dIt.hasNext(); ix++) {
-        Item newItem = dIt.next();
-        found += declat(sup, curr, ix, diffSets, minSup);
+    }
+    
+    setupCost += System.currentTimeMillis() - beg;
+    beg = System.currentTimeMillis();
+    
+    int ix = 0;
+    for (Iterator<Item> dIt = diffSets.iterator(); dIt.hasNext(); ix++) {
+      Item newItem = dIt.next();
+      found += declat(sup, curr, ix, diffSets, minSup);
+      if (closureCheck(sup, newItem)) {
+        break;
+      }
+    }
+    
+    recursiveCost += System.currentTimeMillis() - beg;
+    
+    if (pgReporter != null && curr.size() == maxSize - 1 && !diffSets.isEmpty()) {
+      // create prefixes list
+      StringBuilder builder = new StringBuilder();
+      for (Item anItem : curr) {
+        builder.append(anItem.name + "_");
+      }
+      List<Extension> extensions = new LinkedList<Extension>();
+      for (Iterator<Item> nIt = diffSets.iterator(); nIt.hasNext();) {
+        Item newItem = nIt.next();
+        Extension extension = new Extension(newItem.name);
+        extension.setSupport(newItem.freq());
         if (closureCheck(sup, newItem)) {
-          break;
-        }
-      }
-      
-      recursiveCost += System.currentTimeMillis() - beg;
-      
-      if (pgReporter != null && curr.size() == maxSize - 1 && !diffSets.isEmpty()) {
-        // create prefixes list
-        StringBuilder builder = new StringBuilder();
-        for (Item anItem : curr) {
-          builder.append(anItem.name + "_");
-        }
-        List<Extension> extensionss = new LinkedList<Extension>();
-        for (Iterator<Item> nIt = diffSets.iterator(); nIt.hasNext();) {
-          Item newItem = nIt.next();
-          Extension extention = new Extension(newItem.name);
-          extention.setSupport(newItem.freq());
-          if (closureCheck(sup, newItem)) {
-            while (nIt.hasNext()) {
-              extention.addSubExtension(nIt.next().name);
-            }
+          while (nIt.hasNext()) {
+            extension.addSubExtension(nIt.next().name);
           }
-          extensionss.add(extention);
         }
-        pgReporter.report(builder.toString(), extensions);
+        extensions.add(extension);
       }
+      pgReporter.report(builder.toString(), candidates);
     }
     
     return found;
@@ -282,8 +293,8 @@ public class EclatMiner {
     
     List<Item> newBitSets = new ArrayList<Item>();
     if (curr.size() < maxSize) {
-      ListIterator<Item> it = bitSets.listIterator(index + 1);
-      while (it.hasNext()) {
+      
+      for (Iterator<Item> it = bitSets.listIterator(index + 1); it.hasNext();) {
         Item nextItem = it.next();
         int[] condTids;
         // if (curr.isEmpty()) {
@@ -317,10 +328,25 @@ public class EclatMiner {
       for (Iterator<Item> nIt = newBitSets.iterator(); nIt.hasNext(); i++) {
         Item newItem = nIt.next();
         found += declat(sup, curr, i, newBitSets, minSup);
-        if (closureCheck(sup, newItem)) {
-          break;
-        }
+        // if (closureCheck(sup, newItem)) {
+        // break;
+        // }
       }
+    } else {
+      Iterator<Item> it = curr.iterator();
+      int[] tids;
+      if (it.hasNext()) {
+        final int[] firstTids = it.next().getTids();
+        tids = Arrays.copyOf(firstTids, firstTids.length);
+        
+        while (it.hasNext()) {
+          Item freqItem = it.next();
+          item = singletons.get(indices.get(freqItem.name));
+          tids = intersect(tids, item.getTids());
+        }
+        reporter.report(curr, sup, tids);
+      }
+      // int[] tids = new int[];
     }
     if (pgReporter != null && curr.size() == maxSize - 1 && !newBitSets.isEmpty()) {
       // create prefixes list
@@ -344,18 +370,6 @@ public class EclatMiner {
     }
     curr.pollLast();
     return found;
-  }
-  
-  public static class State {
-    int currSup;
-    List<Item> prefix;
-    List<Item> items;
-    
-    public State(int currSup, List<Item> nPrefix, List<Item> items) {
-      this.currSup = currSup;
-      this.prefix = nPrefix;
-      this.items = items;
-    }
   }
   
   private static List<Item> readSingletons(Configuration conf, Path path) throws IOException, URISyntaxException {

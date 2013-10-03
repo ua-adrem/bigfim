@@ -155,8 +155,8 @@ public class PrefixComputerReducer extends Reducer<Text,ObjectWritable,Text,Text
    *          the list of singletons
    */
   private void handleSingleton(Iterable<ObjectWritable> values) {
-    for (Iterator<ObjectWritable> it = values.iterator(); it.hasNext();) {
-      String[] split = ((String) (it.next().get())).split("\\)");
+    for (ObjectWritable value : values) {
+      String[] split = ((String) value.get()).split("\\)");
       for (String item : split) {
         String[] itemSplit = item.split(" \\(");
         String[] items = itemSplit[0].split(" ");

@@ -1,5 +1,6 @@
 package ua.fim.disteclat.util;
 
+import static java.lang.Integer.parseInt;
 import static ua.fim.disteclat.util.SetReporter.Util.getItemString;
 import static ua.fim.disteclat.util.TriePrinter.CLOSESUP;
 import static ua.fim.disteclat.util.TriePrinter.OPENSUP;
@@ -398,5 +399,60 @@ public interface SetReporter {
         p.println(builder.toString());
       }
     }
+  }
+  
+  public static class PrefixItemTIDsReporter implements SetReporter {
+    
+    private Context context;
+    private int prefixLength;
+    
+    public PrefixItemTIDsReporter(Context context, int prefixLength) {
+      this.context = context;
+      this.prefixLength = prefixLength;
+    }
+    
+    @Override
+    public void report(List<Item> itemset, int support) {
+      throw new UnsupportedOperationException("This reporter needs TIDs!");
+    }
+    
+    @Override
+    public void report(List<Item> itemset, int support, int[] tids) {
+      StringBuilder sb = new StringBuilder();
+      if(itemset.size() < prefixLength){
+        System.out.println("Found a short fis:" + itemset);
+        return;
+      }
+      int prefixStrLength = 0;
+      Item lastItem = null;
+      for (Item item : itemset) {
+        prefixStrLength = sb.length() - 1;
+        sb.append(item.name).append(" ");
+        lastItem = item;
+      }
+      sb.setLength(prefixStrLength);
+      
+      Text key = new Text(sb.toString());
+      
+      IntWritable[] iw = new IntWritable[tids.length + 1];
+      
+      for (int i = 1; i < iw.length; i++) {
+        iw[i]= new IntWritable(tids[i - 1]);
+      }
+      iw[0]= new IntWritable(parseInt(lastItem.name));
+      
+      try {
+        context.write(key, new IntArrayWritable(iw));
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    }
+    
+    @Override
+    public void close() {
+      // TODO Auto-generated method stub
+      
+    }
+    
   }
 }

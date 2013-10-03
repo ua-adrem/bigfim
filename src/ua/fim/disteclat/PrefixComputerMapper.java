@@ -23,7 +23,9 @@ import org.apache.hadoop.mapreduce.Mapper;
 
 import ua.fim.disteclat.util.Item;
 import ua.fim.disteclat.util.PrefixGroupReporter.HadoopPGReporter;
+import ua.fim.disteclat.util.SetReporter;
 import ua.fim.disteclat.util.SetReporter.HadoopPerLevelReporter;
+import ua.hadoop.util.IntArrayWritable;
 
 /**
  * This class implements the Mapper for the second MapReduce cycle for Dist-Eclat. It receives a list of singletons for
@@ -32,7 +34,7 @@ import ua.fim.disteclat.util.SetReporter.HadoopPerLevelReporter;
  * 
  * @author Sandy Moens & Emin Aksehirli
  */
-public class PrefixComputerMapper extends Mapper<LongWritable,Text,Text,ObjectWritable> {
+public class PrefixComputerMapper extends Mapper<LongWritable,Text,Text,IntArrayWritable> {
   
   /*
    * ========================================================================
@@ -87,6 +89,25 @@ public class PrefixComputerMapper extends Mapper<LongWritable,Text,Text,ObjectWr
     }
   }
   
+  @Override
+  public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
+    String[] split = value.toString().split("\t");
+    String items = split[1];
+    
+    // if the prefix length is 1, just report the singletons, otherwise use
+    // Eclat to find X-FIs seeds
+    EclatMiner miner = new EclatMiner();
+    SetReporter reporter = new SetReporter.PrefixItemTIDsReporter(context, prefixLength);
+    miner.setSetReporter(reporter);
+    miner.setMaxSize(prefixLength);
+    
+    for (String item : items.split(" ")) {
+      miner.mine(orderMap, singletons, item, minSup);
+    }
+    
+    miner.close();
+  }
+  
   /**
    * Sorts the singletons using the orderings retrieved from file
    */
@@ -99,36 +120,5 @@ public class PrefixComputerMapper extends Mapper<LongWritable,Text,Text,ObjectWr
         return o1Rank.compareTo(o2Rank);
       }
     });
-  }
-  
-  @Override
-  public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
-    String[] split = value.toString().split("\t");
-    String items = split[1];
-    
-    // if the prefix length is 1, just report the singletons, otherwise use
-    // Eclat to find X-FIs seeds
-    if (prefixLength == 1) {
-      for (String item : items.split(" ")) {
-        int support = singletons.get(orderMap.get(item)).freq();
-        ObjectWritable ow = new ObjectWritable(item + " (" + support + ")");
-        context.write(new Text(Singleton), ow);
-      }
-    } else {
-      EclatMiner miner = new EclatMiner();
-      HadoopPerLevelReporter reporter = new HadoopPerLevelReporter(context, Fis, Prefix, prefixLength, Delimiter);
-      miner.setSetReporter(reporter);
-      miner.setPrefixGroupReporter(new HadoopPGReporter(context));
-      miner.setMaxSize(prefixLength);
-      
-      for (String item : items.split(" ")) {
-        int support = singletons.get(orderMap.get(item)).freq();
-        ObjectWritable ow = new ObjectWritable(item + " (" + support + ")");
-        context.write(new Text(Singleton), ow);
-        miner.mine(orderMap, singletons, item, minSup);
-      }
-      
-      miner.close();
-    }
   }
 }

@@ -16,29 +16,37 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.filecache.DistributedCache;
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
-import org.apache.hadoop.io.ObjectWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.NLineInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.apache.hadoop.mapreduce.lib.output.MultipleOutputs;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
 import ua.fim.configuration.Config;
+import ua.fim.eclat.EclatMinerMapper;
+import ua.fim.eclat.EclatMinerMapperSetCount;
+import ua.fim.eclat.EclatMinerReducer;
+import ua.fim.eclat.EclatMinerReducerSetCount;
 import ua.hadoop.util.IntArrayWritable;
+import ua.hadoop.util.NoSplitSequenceFileInputFormat;
 import ua.hadoop.util.SplitByNumberOfMappersTextInputFormat;
+
+//import org.apache.hadoop.io.LongWritable;
 
 /**
  * Driver class for Dist-Eclat (distributed Eclat) implementation on the Hadoop framework. Dist-Eclat operates in three
@@ -102,8 +110,8 @@ public class DistEclatDriver extends Configured implements Tool {
     }
     config.printConfig();
     
-    String tmpDir1 = config.getOutputDir() + separator + "tmp1";
-    String tmpDir2 = config.getOutputDir() + separator + "tmp2";
+    String tmpDir1 = config.getOutputDir() + separator + "tmp1" + separator;
+    String tmpDir2 = config.getOutputDir() + separator + "prefixes" + separator;
     
     long start = System.currentTimeMillis();
     cleanDirs(new String[] {config.getOutputDir(), tmpDir1, tmpDir2});
@@ -114,10 +122,6 @@ public class DistEclatDriver extends Configured implements Tool {
     
     System.out.println("[Eclat]: Total time: " + (end - start) / 1000 + "s");
     
-    // getAvgNumberOfPrefixes(tmpDir2);
-    // if (!config.getWriteSets()) {
-    // getNumberOfItemsets(config.getOutputFile());
-    // }
     return 0;
   }
   
@@ -283,20 +287,18 @@ public class DistEclatDriver extends Configured implements Tool {
     job.setJarByClass(DistEclatDriver.class);
     
     job.setMapOutputKeyClass(Text.class);
-    job.setMapOutputValueClass(ObjectWritable.class);
+    job.setMapOutputValueClass(IntArrayWritable.class);
     
     job.setMapperClass(PrefixComputerMapper.class);
-    job.setReducerClass(PrefixComputerReducer.class);
+    job.setReducerClass(NewPrefixComputerReducer.class);
     
     job.setInputFormatClass(NLineInputFormat.class);
     
     job.setNumReduceTasks(1);
     
-    MultipleOutputs.addNamedOutput(job, OFises, TextOutputFormat.class, Text.class, Text.class);
-    
-    MultipleOutputs.addNamedOutput(job, OPrefixesDistribution, TextOutputFormat.class, Text.class, Text.class);
-    
-    MultipleOutputs.addNamedOutput(job, OPrefixesGroups, SequenceFileOutputFormat.class, Text.class, Text.class);
+    job.setOutputKeyClass(IntArrayWritable.class);
+    job.setOutputValueClass(IntArrayWritable.class);
+    job.setOutputFormatClass(SequenceFileOutputFormat.class);
     
     FileInputFormat.addInputPath(job, new Path(inputFile));
     FileOutputFormat.setOutputPath(job, new Path(outputDir));
@@ -326,41 +328,46 @@ public class DistEclatDriver extends Configured implements Tool {
   private static void startMining(String inputDir, String outputDir, Config config) throws IOException,
       InterruptedException, ClassNotFoundException, URISyntaxException {
     
-    String singletonsTidsFile = outputDir + separator + "tmp1" + separator + OSingletonsTids + rExt;
-    String prefixesDistributionFile = outputDir + separator + "tmp2" + separator + OPrefixesDistribution + rExt;
-    String prefixesGroupsFile = outputDir + separator + "tmp2" + separator + OPrefixesGroups + rExt;
+    String inputFilesDir = inputDir;
     String outputFile = outputDir + separator + OFis;
-    
-    System.out.println("[Mining]: input: " + prefixesDistributionFile + ", output: " + outputFile);
+    System.out.println("[StartMining]: input: " + inputFilesDir + ", output: " + outputFile);
     
     Configuration conf = new Configuration();
     setConfigurationValues(conf, config);
     
-    Job job = new Job(conf, "startMining");
+    Job job = new Job(conf, "Start Mining");
     job.setJarByClass(DistEclatDriver.class);
     
-    job.setMapOutputKeyClass(Text.class);
+    job.setOutputKeyClass(Text.class);
     
     if (config.getWriteSets()) {
       job.setOutputValueClass(Text.class);
-      job.setMapperClass(SubEclatMapper.class);
-      job.setReducerClass(SubEclatReducer.class);
+      job.setMapperClass(EclatMinerMapper.class);
+      job.setReducerClass(EclatMinerReducer.class);
     } else {
       job.setOutputValueClass(LongWritable.class);
-      job.setMapperClass(SubEclatMapperSetCount.class);
-      job.setReducerClass(SubEclatReducerSetCount.class);
+      job.setMapperClass(EclatMinerMapperSetCount.class);
+      job.setReducerClass(EclatMinerReducerSetCount.class);
     }
     
-    job.setInputFormatClass(NLineInputFormat.class);
+    job.setInputFormatClass(NoSplitSequenceFileInputFormat.class);
+    
+    List<Path> inputPaths = new ArrayList<Path>();
+    
+    FileSystem fs = FileSystem.get(conf);
+    FileStatus[] listStatus = fs.globStatus(new Path(inputFilesDir + "bucket*"));
+    for (FileStatus fstat : listStatus) {
+      // if (fstat.getPath().toString().startsWith("bucket")) {
+      inputPaths.add(fstat.getPath());
+      // }
+    }
+    
+    FileInputFormat.setInputPaths(job, inputPaths.toArray(new Path[inputPaths.size()]));
+    FileOutputFormat.setOutputPath(job, new Path(outputFile));
+    
     job.setOutputFormatClass(TextOutputFormat.class);
     
     job.setNumReduceTasks(1);
-    
-    FileInputFormat.addInputPath(job, new Path(prefixesDistributionFile));
-    FileOutputFormat.setOutputPath(job, new Path(outputFile));
-    
-    DistributedCache.addCacheFile(new URI(singletonsTidsFile), job.getConfiguration());
-    DistributedCache.addCacheFile(new URI(prefixesGroupsFile), job.getConfiguration());
     
     long start = System.currentTimeMillis();
     job.waitForCompletion(true);
