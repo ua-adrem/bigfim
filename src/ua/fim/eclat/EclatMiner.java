@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Queue;
 
+import ua.fim.eclat.util.CmdLineReporter;
 import ua.fim.eclat.util.Item;
 import ua.fim.eclat.util.SetReporter;
 import ua.util.Tools;
@@ -149,7 +150,7 @@ public class EclatMiner {
     int minSup = 5;
     List<Item> items = readItemsFromFile(filename);
     EclatMiner miner = new EclatMiner();
-    miner.setSetReporter(new SetReporter.CmdReporter());
+    miner.setSetReporter(new CmdLineReporter());
     miner.mine(new int[] {}, items, minSup);
   }
   
