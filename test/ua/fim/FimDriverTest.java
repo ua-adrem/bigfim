@@ -6,14 +6,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Deque;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.Stack;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -173,18 +170,13 @@ public class FimDriverTest {
     return actuals;
   }
   
-  private static void runMiner() throws Exception {
-    final String configFile = Dist_Eclat_Config_File;
-    runMiner(configFile);
-  }
-  
   private static void runMiner(final String configFile) throws Exception {
     FimDriver.main(new String[] {configFile});
   }
-
+  
   private static void delete(File file) {
-    if(file.isDirectory()){
-      for(File f :file.listFiles()){
+    if (file.isDirectory()) {
+      for (File f : file.listFiles()) {
         delete(f);
       }
     }

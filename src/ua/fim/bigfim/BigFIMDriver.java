@@ -41,10 +41,6 @@ import org.apache.hadoop.util.ToolRunner;
 
 import ua.fim.configuration.Config;
 import ua.fim.disteclat.DistEclatDriver;
-import ua.fim.disteclat.SubEclatMapper;
-import ua.fim.disteclat.SubEclatMapperSetCount;
-import ua.fim.disteclat.SubEclatReducer;
-import ua.fim.disteclat.SubEclatReducerSetCount;
 import ua.hadoop.util.IntArrayWritable;
 import ua.hadoop.util.NoSplitSequenceFileInputFormat;
 import ua.hadoop.util.SplitByNumberOfMappersTextInputFormat;

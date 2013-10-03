@@ -51,7 +51,6 @@ public class ComputeTidListMapper extends Mapper<LongWritable,Text,Text,IntArray
     }
   }
   
-  private Text key;
   private IntArrayWritable iaw;
   
   private Set<Integer> singletons;
@@ -87,7 +86,6 @@ public class ComputeTidListMapper extends Mapper<LongWritable,Text,Text,IntArray
     counter = 0;
     id = context.getTaskAttemptID().getTaskID().getId();
     
-    key = new Text();
     iaw = new IntArrayWritable();
   }
   
