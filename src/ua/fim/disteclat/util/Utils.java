@@ -1,10 +1,5 @@
 package ua.fim.disteclat.util;
 
-import static ua.fim.disteclat.util.PrefixGroupReporter.DELIMITER_EXTENSIONS;
-import static ua.fim.disteclat.util.PrefixGroupReporter.DELIMITER_SUBEXTENSIONS;
-import static ua.fim.disteclat.util.PrefixGroupReporter.DELIMITER_SUBEXTENSIONSLIST;
-import static ua.fim.disteclat.util.PrefixGroupReporter.DELIMITER_SUPPORT;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -23,7 +18,6 @@ import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 
-import ua.fim.disteclat.util.PrefixGroupReporter.Extension;
 import ua.hadoop.util.IntArrayWritable;
 import ua.util.Tools;
 
@@ -53,52 +47,8 @@ public class Utils {
     return bitSets;
   }
   
-  public static Map<String,List<Extension>> readPrefixesGroups(Configuration conf, Path path) throws IOException,
-      URISyntaxException {
-    SequenceFile.Reader r = new SequenceFile.Reader(FileSystem.get(new URI("file:///"), conf), path, conf);
-    
-    Map<String,List<Extension>> prefixGroups = new HashMap<String,List<Extension>>();
-    
-    Text key = new Text();
-    Text value = new Text();
-    
-    while (r.next(key, value)) {
-      String group = key.toString();
-      String extsString = value.toString();
-      String[] exts = extsString.split(DELIMITER_EXTENSIONS);
-      List<Extension> extsList = new ArrayList<Extension>(exts.length);
-      String last = exts[exts.length - 1];
-      for (String extension : exts) {
-        String[] ext = extension.split(DELIMITER_SUPPORT);
-        Extension oExt = new Extension(ext[0]);
-        if (extension == last) {
-          // FIXME: Can be taken out of the loop!
-          String[] split = ext[1].split("\\" + DELIMITER_SUBEXTENSIONSLIST);
-          if (split.length == 2) {
-            for (String subExtension : split[1].split("\\" + DELIMITER_SUBEXTENSIONS)) {
-              oExt.addSubExtension(subExtension);
-            }
-          }
-        }
-        extsList.add(oExt);
-      }
-      prefixGroups.put(group, extsList);
-    }
-    r.close();
-    
-    return prefixGroups;
-  }
   
-  public static String getGroupString(String itemsString) {
-    StringBuilder builder = new StringBuilder();
-    String[] items = itemsString.split("_");
-    for (int i = 0; i < items.length - 1; i++) {
-      builder.append(items[i] + "_");
-    }
-    return builder.toString();
-  }
-  
-  public static Map<String,Integer> readSingletonsOrder(Configuration conf, Path path) throws IOException {
+  public static Map<String,Integer> readSingletonsOrder(Path path) throws IOException {
     BufferedReader reader = new BufferedReader(new FileReader(path.toString()));
     
     String order = reader.readLine().trim();

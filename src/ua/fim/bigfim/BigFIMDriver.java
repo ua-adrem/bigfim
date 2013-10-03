@@ -10,15 +10,12 @@ import static ua.fim.configuration.Config.PREFIX_LENGTH_KEY;
 import static ua.fim.configuration.Config.WRITE_SETS_KEY;
 import static ua.hadoop.util.Tools.cleanDirs;
 
-import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringTokenizer;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
@@ -40,7 +37,6 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
 import ua.fim.configuration.Config;
-import ua.fim.disteclat.DistEclatDriver;
 import ua.fim.eclat.EclatMinerMapper;
 import ua.fim.eclat.EclatMinerMapperSetCount;
 import ua.fim.eclat.EclatMinerReducer;
@@ -69,6 +65,7 @@ public class BigFIMDriver extends Configured implements Tool {
       FileSystem fs = FileSystem.get(path.toUri(), new Configuration());
       fs.open(path);
       config.readConfig(new InputStreamReader(fs.open(path)));
+      fs.close();
     } else {
       config.readConfig(args[0]);
     }
@@ -76,15 +73,16 @@ public class BigFIMDriver extends Configured implements Tool {
       System.out.println("Config file is invalid!");
       return -1;
     }
+    
     config.printConfig();
     
-    String iFile = config.getInputFile();
-    String oFile = config.getOutputDir();
-    cleanDirs(new String[] {oFile});
+    String inputDir = config.getInputFile();
+    String outputDir = config.getOutputDir();
+    cleanDirs(new String[] {outputDir});
     long start = System.currentTimeMillis();
-    long nrLines = startAprioriPhase(iFile, oFile, config);
-    startCreatePrefixGroups(iFile, oFile, config, nrLines);
-    startMining(iFile, oFile, config);
+    long nrLines = startAprioriPhase(inputDir, outputDir, config);
+    startCreatePrefixGroups(inputDir, outputDir, config, nrLines);
+    startMining(outputDir, config);
     long end = System.currentTimeMillis();
     
     System.out.println("[Eclat]: Total time: " + (end - start) / 1000 + "s");
@@ -94,46 +92,6 @@ public class BigFIMDriver extends Configured implements Tool {
     // getNumberOfItemsets(config.getOutputFile());
     // }
     return 0;
-  }
-  
-  private static void getAvgNumberOfPrefixes(String dir) {
-    Path path = new Path(dir + File.separator + DistEclatDriver.OPrefixesDistribution + rExt);
-    int total = 0;
-    int nrOfLines = 0;
-    try {
-      FileSystem fs = FileSystem.get(new Configuration());
-      
-      BufferedReader reader = new BufferedReader(new InputStreamReader(fs.open(path)));
-      String line;
-      while ((line = reader.readLine()) != null) {
-        int tIx = line.indexOf('\t');
-        String prefixes = line.substring(tIx + 1);
-        StringTokenizer st = new StringTokenizer(prefixes);
-        total += st.countTokens();
-        nrOfLines++;
-      }
-      reader.close();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    System.out.println("[Eclat Partition]: Average number of prefixes=" + (1.0 * total / nrOfLines));
-  }
-  
-  private static void getNumberOfItemsets(String dir) {
-    Path path = new Path(dir + File.separator + OFis + File.separator + "part" + rExt);
-    try {
-      FileSystem fs = FileSystem.get(new Configuration());
-      
-      BufferedReader reader = new BufferedReader(new InputStreamReader(fs.open(path)));
-      System.out.println("[Eclat Result]: Number of itemsets found");
-      String line;
-      while ((line = reader.readLine()) != null) {
-        System.out.println(line);
-      }
-      reader.close();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
   }
   
   private static void setConfigurationValues(Configuration conf, Config config) {
@@ -195,7 +153,7 @@ public class BigFIMDriver extends Configured implements Tool {
     return nrLines;
   }
   
-  private void startCreatePrefixGroups(String inputFile, String outputDir, Config config, long nrLines)
+  private static void startCreatePrefixGroups(String inputFile, String outputDir, Config config, long nrLines)
       throws IOException, ClassNotFoundException, InterruptedException, URISyntaxException {
     String cacheFile = outputDir + separator + "ap" + config.getPrefixLength() + separator + "part-r-00000";
     String outputFile = outputDir + separator + "pg";
@@ -234,10 +192,10 @@ public class BigFIMDriver extends Configured implements Tool {
     System.out.println("Job Prefix Creation took " + (end - start) / 1000 + "s");
   }
   
-  private static void startMining(String inputFile, String outputDir, Config config) throws IOException,
-      URISyntaxException, ClassNotFoundException, InterruptedException {
+  private static void startMining(String outputDir, Config config) throws IOException, ClassNotFoundException,
+      InterruptedException {
     String inputFilesDir = outputDir + separator + "pg" + separator;
-    String outputFile = outputDir + separator + "fis";
+    String outputFile = outputDir + separator + OFis;
     System.out.println("[StartMining]: input: " + inputFilesDir + ", output: " + outputFile);
     
     Configuration conf = new Configuration();
@@ -268,10 +226,9 @@ public class BigFIMDriver extends Configured implements Tool {
     
     FileSystem fs = FileSystem.get(conf);
     FileStatus[] listStatus = fs.globStatus(new Path(inputFilesDir + "bucket*"));
+    fs.close();
     for (FileStatus fstat : listStatus) {
-      // if (fstat.getPath().toString().startsWith("bucket")) {
       inputPaths.add(fstat.getPath());
-      // }
     }
     
     FileInputFormat.setInputPaths(job, inputPaths.toArray(new Path[inputPaths.size()]));

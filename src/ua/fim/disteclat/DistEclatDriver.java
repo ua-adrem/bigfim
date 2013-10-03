@@ -10,15 +10,12 @@ import static ua.fim.configuration.Config.PREFIX_LENGTH_KEY;
 import static ua.fim.configuration.Config.WRITE_SETS_KEY;
 import static ua.hadoop.util.Tools.cleanDirs;
 
-import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringTokenizer;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
@@ -101,6 +98,7 @@ public class DistEclatDriver extends Configured implements Tool {
       FileSystem fs = FileSystem.get(path.toUri(), new Configuration());
       fs.open(path);
       config.readConfig(new InputStreamReader(fs.open(path)));
+      fs.close();
     } else {
       config.readConfig(args[0]);
     }
@@ -123,59 +121,6 @@ public class DistEclatDriver extends Configured implements Tool {
     System.out.println("[Eclat]: Total time: " + (end - start) / 1000 + "s");
     
     return 0;
-  }
-  
-  /**
-   * Gets the average number of prefixes, that has been used in the mining process, from the specified directory.
-   * Essentially it reads the distribution file and counts the number of prefixes assigned to each node.
-   * 
-   * @param dir
-   *          the directory in which the prefix distribution file resides
-   */
-  private static void getAvgNumberOfPrefixes(String dir) {
-    Path path = new Path(dir + File.separator + DistEclatDriver.OPrefixesDistribution + rExt);
-    int total = 0;
-    int nrOfLines = 0;
-    try {
-      FileSystem fs = FileSystem.get(new Configuration());
-      
-      BufferedReader reader = new BufferedReader(new InputStreamReader(fs.open(path)));
-      String line;
-      while ((line = reader.readLine()) != null) {
-        int tIx = line.indexOf('\t');
-        String prefixes = line.substring(tIx + 1);
-        StringTokenizer st = new StringTokenizer(prefixes);
-        total += st.countTokens();
-        nrOfLines++;
-      }
-      reader.close();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    System.out.println("[Eclat Partition]: Average number of prefixes=" + (1.0 * total / nrOfLines));
-  }
-  
-  /**
-   * Gets and outputs the counts of itemsets mined for depth of the tree
-   * 
-   * @param dir
-   *          the directory in which the output file resides
-   */
-  private static void getNumberOfItemsets(String dir) {
-    Path path = new Path(dir + File.separator + OFis + File.separator + "part" + rExt);
-    try {
-      FileSystem fs = FileSystem.get(new Configuration());
-      
-      BufferedReader reader = new BufferedReader(new InputStreamReader(fs.open(path)));
-      System.out.println("[Eclat Result]: Number of itemsets found");
-      String line;
-      while ((line = reader.readLine()) != null) {
-        System.out.println(line);
-      }
-      reader.close();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
   }
   
   /**
@@ -290,7 +235,7 @@ public class DistEclatDriver extends Configured implements Tool {
     job.setMapOutputValueClass(IntArrayWritable.class);
     
     job.setMapperClass(PrefixComputerMapper.class);
-    job.setReducerClass(NewPrefixComputerReducer.class);
+    job.setReducerClass(PrefixComputerReducer.class);
     
     job.setInputFormatClass(NLineInputFormat.class);
     
@@ -357,9 +302,7 @@ public class DistEclatDriver extends Configured implements Tool {
     FileSystem fs = FileSystem.get(conf);
     FileStatus[] listStatus = fs.globStatus(new Path(inputFilesDir + "bucket*"));
     for (FileStatus fstat : listStatus) {
-      // if (fstat.getPath().toString().startsWith("bucket")) {
       inputPaths.add(fstat.getPath());
-      // }
     }
     
     FileInputFormat.setInputPaths(job, inputPaths.toArray(new Path[inputPaths.size()]));
@@ -373,6 +316,7 @@ public class DistEclatDriver extends Configured implements Tool {
     job.waitForCompletion(true);
     long end = System.currentTimeMillis();
     System.out.println("[Mining]: Took " + (end - start) / 1000 + "s");
+    fs.close();
   }
   
   public static void main(String[] args) throws Exception {

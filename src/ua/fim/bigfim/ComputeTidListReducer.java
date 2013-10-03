@@ -28,7 +28,7 @@ public class ComputeTidListReducer extends Reducer<Text,IntArrayWritable,IntArra
   private static int MAX_FILE_SIZE = 1000000000;
   private static int MAX_NUMBER_OF_TIDS = (int) ((MAX_FILE_SIZE / 4) * 0.7);
   
-  private static IntArrayWritable emptyIaw;
+  private final static IntArrayWritable EmptyIaw = new IntArrayWritable(new IntWritable[0]);
   
   private int minSup;
   private int subDbSize;
@@ -51,8 +51,6 @@ public class ComputeTidListReducer extends Reducer<Text,IntArrayWritable,IntArra
     
     mos = new MultipleOutputs<IntArrayWritable,IntArrayWritable>(context);
     
-    IntWritable[] iw = new IntWritable[0];
-    emptyIaw = new IntArrayWritable(iw);
   }
   
   @Override
@@ -98,7 +96,7 @@ public class ComputeTidListReducer extends Reducer<Text,IntArrayWritable,IntArra
     bucketSizes.get(lowestBucket).addAndGet(totalTids);
     
     String baseOutputPath = "bucket-" + lowestBucket;
-    mos.write(convert(key.toString()), emptyIaw, baseOutputPath);
+    mos.write(convert(key.toString()), EmptyIaw, baseOutputPath);
     for (Entry<Integer,List<Integer>> entry : map.entrySet()) {
       if (entry.getValue().size() >= minSup) {
         IntArrayWritable owKey = convert(entry.getKey());
@@ -106,10 +104,10 @@ public class ComputeTidListReducer extends Reducer<Text,IntArrayWritable,IntArra
         mos.write(owKey, owValue, baseOutputPath);
       }
     }
-    mos.write(emptyIaw, emptyIaw, baseOutputPath);
+    mos.write(EmptyIaw, EmptyIaw, baseOutputPath);
   }
   
-  private boolean checkLowestBucket(int lowestBucket, int totalTids) {
+  private static boolean checkLowestBucket(int lowestBucket, int totalTids) {
     return (lowestBucket + totalTids) <= MAX_NUMBER_OF_TIDS;
   }
   
@@ -133,7 +131,7 @@ public class ComputeTidListReducer extends Reducer<Text,IntArrayWritable,IntArra
     mos.close();
   }
   
-  private IntArrayWritable convert(String string) {
+  private static IntArrayWritable convert(String string) {
     String[] splits = string.split(" ");
     IntWritable[] iw = new IntWritable[splits.length];
     int i = 0;

@@ -17,14 +17,11 @@ import java.util.Map;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
-import org.apache.hadoop.io.ObjectWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
 import ua.fim.disteclat.util.Item;
-import ua.fim.disteclat.util.PrefixGroupReporter.HadoopPGReporter;
 import ua.fim.disteclat.util.SetReporter;
-import ua.fim.disteclat.util.SetReporter.HadoopPerLevelReporter;
 import ua.hadoop.util.IntArrayWritable;
 
 /**
@@ -36,26 +33,10 @@ import ua.hadoop.util.IntArrayWritable;
  */
 public class PrefixComputerMapper extends Mapper<LongWritable,Text,Text,IntArrayWritable> {
   
-  /*
-   * ========================================================================
-   * 
-   * STATIC
-   * 
-   * ========================================================================
-   */
-  
   public static final String Fis = "fis";
   public static final String Prefix = "prefix";
   public static final String Singleton = "singleton";
   public static final String Delimiter = "$";
-  
-  /*
-   * ========================================================================
-   * 
-   * NON-STATIC
-   * 
-   * ========================================================================
-   */
   
   private List<Item> singletons;
   private Map<String,Integer> orderMap;
@@ -79,7 +60,7 @@ public class PrefixComputerMapper extends Mapper<LongWritable,Text,Text,IntArray
           singletons = readTidLists(conf, path);
         } else if (pathString.contains(OSingletonsOrder)) {
           System.out.println("[PrefixComputerMapper]: Reading singleton orders");
-          orderMap = readSingletonsOrder(conf, path);
+          orderMap = readSingletonsOrder(path);
         }
       }
       

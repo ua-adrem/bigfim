@@ -9,7 +9,6 @@ import java.util.Map;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.lib.output.MultipleOutputs;
 
-import ua.fim.disteclat.PrefixComputerReducer.ItemPair;
 import ua.util.Tools;
 
 /**
@@ -57,7 +56,7 @@ public interface PrefixDistribution {
       }
     }
     
-    private int getLowestIndex(int[] count) {
+    private static int getLowestIndex(int[] count) {
       int min = count[0], minIx = 0;
       for (int ix = 1; ix < count.length; ix++) {
         int value = count[ix];
@@ -113,6 +112,40 @@ public interface PrefixDistribution {
     }
   }
   
+  /**
+   * Class singleton or itemset and its support
+   */
+  public static class ItemPair {
+    public final String[] items;
+    public int support;
+    
+    public ItemPair(String[] items) {
+      this.items = items;
+    }
+    
+    public ItemPair(String[] text, int support) {
+      this(text);
+      this.support = support;
+    }
+    
+    public String getText() {
+      StringBuilder builder = new StringBuilder();
+      for (String item : items) {
+        builder.append(item + "_");
+      }
+      return builder.substring(0, builder.length());
+    }
+    
+    public int getSupport() {
+      return support;
+    }
+    
+    @Override
+    public String toString() {
+      return getText() + " (" + support + ")";
+    }
+  }
+
   void sortPrefixes(List<ItemPair> prefixes, Map<String,Integer> supMap);
   
   public void writeDistributionToOutput(int numberOfMappers, List<ItemPair> prefixes, MultipleOutputs<Text,Text> mos,
