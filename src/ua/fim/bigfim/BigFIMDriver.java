@@ -41,6 +41,10 @@ import org.apache.hadoop.util.ToolRunner;
 
 import ua.fim.configuration.Config;
 import ua.fim.disteclat.DistEclatDriver;
+import ua.fim.eclat.EclatMinerMapper;
+import ua.fim.eclat.EclatMinerMapperSetCount;
+import ua.fim.eclat.EclatMinerReducer;
+import ua.fim.eclat.EclatMinerReducerSetCount;
 import ua.hadoop.util.IntArrayWritable;
 import ua.hadoop.util.NoSplitSequenceFileInputFormat;
 import ua.hadoop.util.SplitByNumberOfMappersTextInputFormat;

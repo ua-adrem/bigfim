@@ -1,4 +1,4 @@
-package ua.fim.bigfim;
+package ua.fim.eclat;
 
 import static ua.fim.configuration.Config.MIN_SUP_KEY;
 
@@ -13,8 +13,8 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.Mapper;
 
-import ua.fim.bigfim.util.Item;
-import ua.fim.bigfim.util.SetReporter;
+import ua.fim.eclat.util.Item;
+import ua.fim.eclat.util.SetReporter;
 import ua.hadoop.util.IntArrayWritable;
 
 public abstract class EclatMinerMapperBase<VALUEOUT> extends Mapper<IntArrayWritable,IntArrayWritable,Text,VALUEOUT> {

@@ -1,4 +1,4 @@
-package ua.fim.bigfim;
+package ua.fim.eclat;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Queue;
 
-import ua.fim.bigfim.util.Item;
-import ua.fim.bigfim.util.SetReporter;
+import ua.fim.eclat.util.Item;
+import ua.fim.eclat.util.SetReporter;
 import ua.util.Tools;
 
 public class EclatMiner {

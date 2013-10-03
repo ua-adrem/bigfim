@@ -1,8 +1,8 @@
-package ua.fim.bigfim;
+package ua.fim.eclat;
 
 import org.apache.hadoop.io.Text;
 
-import ua.fim.bigfim.util.SetReporter;
+import ua.fim.eclat.util.SetReporter;
 
 public class EclatMinerMapper extends EclatMinerMapperBase<Text> {
   

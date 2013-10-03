@@ -1,4 +1,4 @@
-package ua.fim.bigfim.util;
+package ua.fim.eclat.util;
 
 import java.util.Arrays;
 

@@ -1,8 +1,8 @@
-package ua.fim.bigfim;
+package ua.fim.eclat;
 
 import org.apache.hadoop.io.LongWritable;
 
-import ua.fim.bigfim.util.SetReporter;
+import ua.fim.eclat.util.SetReporter;
 
 public class EclatMinerMapperSetCount extends EclatMinerMapperBase<LongWritable> {
   

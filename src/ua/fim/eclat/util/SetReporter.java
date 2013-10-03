@@ -1,4 +1,4 @@
-package ua.fim.bigfim.util;
+package ua.fim.eclat.util;
 
 import static ua.fim.disteclat.util.TriePrinter.CLOSESUP;
 import static ua.fim.disteclat.util.TriePrinter.OPENSUP;

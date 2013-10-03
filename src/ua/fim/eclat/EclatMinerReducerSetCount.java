@@ -1,4 +1,4 @@
-package ua.fim.bigfim;
+package ua.fim.eclat;
 
 import static ua.fim.configuration.Config.PREFIX_LENGTH_KEY;
 

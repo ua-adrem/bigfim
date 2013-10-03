@@ -1,4 +1,4 @@
-package ua.fim.bigfim;
+package ua.fim.eclat;
 
 import java.io.IOException;
 
