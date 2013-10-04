@@ -1,5 +1,7 @@
 package ua.util;
 
+import static java.lang.Integer.parseInt;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -8,11 +10,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 /**
@@ -24,31 +27,44 @@ public class DbTransposer {
   
   private static final String Delimiter = "\t";
   private static final String TidsFlag = "-tids";
-  private static final String Extensions = ".dat";
   
   // items in the database and their tids
-  private Map<String,BitSet> items;
+  private Map<Long,BitSet> items;
+  private int maxItems = Integer.MAX_VALUE;
+  private Set<Long> writtenItems;
   
   /**
-   * Tranposes the input file to vertical database (item) format, and write it to file
+   * Transposes the input file to vertical database (item) format, and write it to file
    * 
    * 'input-extension'-tids.dat
    * 
    * @param inputFileName
-   *          a database in transactional format
+   *          a database in horizontal format
    * @throws FileNotFoundException
    */
   public void transpose(String inputFileName) throws FileNotFoundException {
-    String outputFileName = inputFileName.substring(0, inputFileName.lastIndexOf('.')) + TidsFlag + Extensions;
-    System.out.println("oFile " + outputFileName);
+    
+    int dotIndex = inputFileName.lastIndexOf('.');
+    String outputFileName;
+    if (dotIndex < 1) {
+      outputFileName = inputFileName + TidsFlag;
+    } else {
+      outputFileName = inputFileName.substring(0, dotIndex) + TidsFlag + inputFileName.substring(dotIndex);
+    }
+    
+    System.out.println("Output file: " + outputFileName);
     if (new File(outputFileName).exists()) {
       System.out.println("File exists, aborting!");
       return;
     }
     
-    items = new HashMap<String,BitSet>();
-    readFile(inputFileName);
-    writeItemsToFile(outputFileName);
+    writtenItems = new HashSet<Long>();
+    do {
+      items = new HashMap<Long,BitSet>();
+      readFile(inputFileName);
+      writeItemsToFile(outputFileName);
+      writtenItems.addAll(items.keySet());
+    } while (items.size() == maxItems);
   }
   
   /**
@@ -60,24 +76,15 @@ public class DbTransposer {
    *          name of file to write the vertical database to
    */
   private void writeItemsToFile(String outputFileName) {
-    List<String> sortedItems = new ArrayList<String>(items.keySet());
-    
-    Collections.sort(sortedItems, new Comparator<String>() {
-      @Override
-      public int compare(String s1, String s2) {
-        return new Integer(Integer.parseInt(s1)).compareTo(Integer.parseInt(s2));
-      }
-    });
-    
     try {
-      BufferedWriter w = new BufferedWriter(new FileWriter(outputFileName));
+      BufferedWriter w = new BufferedWriter(new FileWriter(outputFileName, true));
       
-      for (String item : sortedItems) {
+      for (Long item : items.keySet()) {
         StringBuffer buf = new StringBuffer();
         buf.append(item + Delimiter);
-        BitSet bitSet = items.get(item);
+        BitSet set = items.get(item);
         int ix = -1;
-        while ((ix = bitSet.nextSetBit(ix + 1)) != -1) {
+        while ((ix = set.nextSetBit(ix + 1)) != -1) {
           buf.append(ix + " ");
         }
         w.write(buf.toString().trim());
@@ -99,29 +106,41 @@ public class DbTransposer {
    */
   private void readFile(String inputFileName) throws FileNotFoundException {
     Scanner scanner = new Scanner(new File(inputFileName));
-    int i = 0;
+    int rowIx = 0;
     while (scanner.hasNext()) {
       StringTokenizer tk = new StringTokenizer(scanner.nextLine());
       while (tk.hasMoreTokens()) {
-        String item = tk.nextToken();
+        Long item = Long.valueOf(tk.nextToken());
         BitSet tids = items.get(item);
         if (tids == null) {
+          if (items.size() >= maxItems) {
+            continue;
+          }
+          if (writtenItems.contains(item)) {
+            continue;
+          }
           tids = new BitSet();
           items.put(item, tids);
         }
-        tids.set(i);
+        tids.set(rowIx);
       }
-      i++;
+      rowIx++;
     }
     scanner.close();
   }
   
   public static void main(String[] args) {
-    if (args.length != 1) {
-      System.out.println("Please specify: [inputFile]");
+    if (args.length < 1) {
+      System.out.println("Please specify: inputFile [items-per-iteration]");
       return;
     }
+    
     DbTransposer t = new DbTransposer();
+    
+    if (args.length == 2) {
+      t.maxItems = parseInt(args[1]);
+    }
+    
     try {
       t.transpose(args[0]);
     } catch (FileNotFoundException e) {
