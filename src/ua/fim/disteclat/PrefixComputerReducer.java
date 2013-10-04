@@ -30,7 +30,6 @@ public class PrefixComputerReducer extends Reducer<Text,IntArrayWritable,IntArra
   private static IntArrayWritable emptyIaw;
   
   private int minSup;
-  // private int subDbSize;
   
   private List<AtomicInteger> bucketSizes;
   
@@ -96,17 +95,14 @@ public class PrefixComputerReducer extends Reducer<Text,IntArrayWritable,IntArra
     
     String baseOutputPath = "bucket-" + lowestBucket;
     mos.write(convert(key.toString()), emptyIaw, baseOutputPath);
-    System.out.println("DEBUG!! " + key.toString() + ", ");
     for (Entry<Integer,List<Integer>> entry : map.entrySet()) {
       if (entry.getValue().size() >= minSup) {
         IntArrayWritable owKey = convert(entry.getKey());
         IntArrayWritable owValue = convert(entry.getValue());
         mos.write(owKey, owValue, baseOutputPath);
-        System.out.println("DEBUG!! " + entry.getKey() + ", " + entry.getValue());
       }
     }
     mos.write(emptyIaw, emptyIaw, baseOutputPath);
-    System.out.println("DEBUG!! " + ",");
   }
   
   private static boolean checkLowestBucket(int lowestBucket, int totalTids) {
