@@ -28,7 +28,7 @@
 
 	<target name="compile" description="compilation of all files">
 		<mkdir dir="${build}" />
-		<javac srcdir="${src}" destdir="${build}">
+		<javac srcdir="${src}" destdir="${build}" target="1.6" source="1.6">
 			<classpath>
 				<fileset dir="${lib}">
 					<include name="*.jar" />
