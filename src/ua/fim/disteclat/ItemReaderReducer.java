@@ -31,23 +31,7 @@ import ua.hadoop.util.IntArrayWritable;
  */
 public class ItemReaderReducer extends Reducer<Text,IntArrayWritable,Text,Writable> {
   
-  /*
-   * ========================================================================
-   * 
-   * STATIC
-   * 
-   * ========================================================================
-   */
-  
   public static final Text EmptyKey = new Text("");
-  
-  /*
-   * ========================================================================
-   * 
-   * NON-STATIC
-   * 
-   * ========================================================================
-   */
   
   private int numberOfMappers;
   private final Map<String,Integer> itemSupports = new HashMap<String,Integer>();

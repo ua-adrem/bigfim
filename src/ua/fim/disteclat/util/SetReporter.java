@@ -1,7 +1,6 @@
 package ua.fim.disteclat.util;
 
 import static java.lang.Integer.parseInt;
-import static ua.fim.disteclat.util.SetReporter.Util.getItemString;
 import static ua.fim.disteclat.util.TriePrinter.CLOSESUP;
 import static ua.fim.disteclat.util.TriePrinter.OPENSUP;
 import static ua.fim.disteclat.util.TriePrinter.SEPARATOR;
@@ -12,19 +11,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.LongWritable;
-import org.apache.hadoop.io.ObjectWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper.Context;
 

@@ -21,24 +21,8 @@ import ua.hadoop.util.IntArrayWritable;
  */
 public class ItemReaderMapper extends Mapper<LongWritable,Text,Text,IntArrayWritable> {
   
-  /*
-   * ========================================================================
-   * 
-   * STATIC
-   * 
-   * ========================================================================
-   */
-  
   public static final String tidsDelimiter = " ";
   public static final String tidsFileDelimiter = "\t";
-  
-  /*
-   * ========================================================================
-   * 
-   * NON-STATIC
-   * 
-   * ========================================================================
-   */
   
   private int minSup;
   

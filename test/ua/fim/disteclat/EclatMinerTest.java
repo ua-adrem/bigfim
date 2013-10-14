@@ -80,35 +80,6 @@ public class EclatMinerTest {
     assertEqual(expecteds, reporter.itemsets);
   }
   
-//  @Test
-//  public void Checks_For_Candidate_Items() {
-//    
-//    prepareData_5();
-//    
-//    List<Extension> extensions = new ArrayList<Extension>();
-//    
-//    extensions.add(newExtension("2", 9));
-//    extensions.add(newExtension("7", 8));
-//    
-//    final CollectReporter reporter = mineFor(extensions, "1_2", 5);
-//    
-//    final Object[][] expecteds = new Object[][] { {"1 2", 9}, {"1 2 7", 8}};
-//    assertEqual(expecteds, reporter.itemsets);
-//  }
-  
-//  @Test
-//  public void Only_Checks_For_The_Candidate_Items() {
-//    
-//    prepareData_5();
-//    
-//    final List<Extension> extensions = singletonList(newExtension("2", 9));
-//    
-//    final CollectReporter reporter = mineFor(extensions, "1_2", 5);
-//    
-//    final Object[][] expecteds = new Object[][] {{"1 2", 9}};
-//    assertEqual(expecteds, reporter.itemsets);
-//  }
-  
   private void prepareData_5() {
     numOfItems = 10;
     items = createItems(data_5, numOfItems);
@@ -123,16 +94,6 @@ public class EclatMinerTest {
     return reporter;
   }
   
-//  private CollectReporter mineFor(List<Extension> extensions, final String prefix, final int minSup) {
-//    EclatMiner miner = new EclatMiner();
-//    final CollectReporter reporter1 = new CollectReporter();
-//    miner.setSetReporter(reporter1);
-//    miner.mine(extensions, oneToOne, items, prefix, minSup);
-//    
-//    final CollectReporter reporter = reporter1;
-//    return reporter;
-//  }
-
   private static void assertEqual(final Object[][] expecteds, final List<Object[]> actualItemsets) {
     nextExpected: for (Object[] expected : expecteds) {
       for (Iterator<Object[]> it = actualItemsets.iterator(); it.hasNext();) {
@@ -151,16 +112,9 @@ public class EclatMinerTest {
       }
       fail("Expected itemset is not found:" + expected[0] + " (" + expected[1] + ") ");
     }
-    
     assertTrue("There more itemsets then expected!", actualItemsets.isEmpty());
   }
   
-//  private static Extension newExtension(final String name, final int support) {
-//    Extension extension = new Extension(name);
-//    extension.setSupport(support);
-//    return extension;
-//  }
-
   private static String itemsetToStr(List<Item> itemset) {
     String str = "";
     for (Item item : itemset) {

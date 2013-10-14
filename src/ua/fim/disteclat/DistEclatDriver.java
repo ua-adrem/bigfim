@@ -43,8 +43,6 @@ import ua.hadoop.util.IntArrayWritable;
 import ua.hadoop.util.NoSplitSequenceFileInputFormat;
 import ua.hadoop.util.SplitByNumberOfMappersTextInputFormat;
 
-//import org.apache.hadoop.io.LongWritable;
-
 /**
  * Driver class for Dist-Eclat (distributed Eclat) implementation on the Hadoop framework. Dist-Eclat operates in three
  * steps and starts from databases in vertical format. It first mines X-FIs seed elements which it further distributes
@@ -58,14 +56,6 @@ import ua.hadoop.util.SplitByNumberOfMappersTextInputFormat;
  * @author Sandy Moens & Emin Aksehirli
  */
 public class DistEclatDriver extends Configured implements Tool {
-  
-  /*
-   * ========================================================================
-   * 
-   * STATIC
-   * 
-   * ========================================================================
-   */
   
   // output files first MapReduce cycle
   public static final String OSingletonsDistribution = "singletonsDistribution";

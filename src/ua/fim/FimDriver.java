@@ -11,14 +11,6 @@ import ua.fim.disteclat.DistEclatDriver;
  */
 public class FimDriver {
   
-  /*
-   * ========================================================================
-   * 
-   * STATIC
-   * 
-   * ========================================================================
-   */
-  
   public static enum FimVersion {
     DISTECLAT, BIGFIM
   }
