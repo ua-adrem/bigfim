@@ -8,6 +8,7 @@ import static org.junit.Assert.fail;
 import static ua.util.Tools.intersect;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -37,6 +38,8 @@ public class EclatMinerTest {
   private List<Item> items;
   private List<Item> extensions;
   private Map<Integer,Item> itemMap;
+  private int maxSize = -1;
+  private int minSize = -1;
 
   // @formatter:on
   
@@ -77,8 +80,7 @@ public class EclatMinerTest {
     final CollectReporter reporter = mineFor("1", 5);
     
     final Object[][] expecteds = new Object[][] { {"1 2", 9}, {"1 3", 5}, {"1 5", 5}, {"1 2 3", 5}, {"1 2 5", 5},
-        {"1 3 5", 5}, {"1 2 3 5", 5},};
-    
+        {"1 3 5", 5}, {"1 2 3 5", 5}};
     assertEqual(expecteds, reporter.itemsets);
   }
   
@@ -97,7 +99,7 @@ public class EclatMinerTest {
   }
   
   @Test
-  public void Conditional_Database_Can_Be_Longer_Than_1_Item() {
+  public void prefix_Can_Be_Longer_Than_1_Item() {
     
     prepareData_5();
     
@@ -105,6 +107,51 @@ public class EclatMinerTest {
     final CollectReporter reporter = mineFor("5 8", 5);
     
     final Object[][] expecteds = new Object[][] { {"5 8 9", 5}, {"5 8 0", 5}, {"5 8 9 0", 5}};
+    assertEqual(expecteds, reporter.itemsets);
+  }
+  
+  @Test
+  public void short_Itemsets_Are_Not_Reported() {
+    prepareData_5();
+    
+    prepareExtensions("1", 2, 3, 5);
+    // Maximal freq itemset for minSup=5 is "1 2 3 5"
+    
+    minSize = 3;
+    final CollectReporter reporter = mineFor("1", 5);
+    
+    final Object[][] expecteds = new Object[][] { {"1 2 3", 5}, {"1 3 5", 5}, {"1 2 5", 5}, {"1 2 3 5", 5}};
+    assertEqual(expecteds, reporter.itemsets);
+  }
+  
+  @Test
+  public void mine_The_Tree_Upto_A_Specified_Depth() {
+    
+    prepareData_5();
+    
+    prepareExtensions("1", 2, 3, 5);
+    // Maximal freq itemset for minSup=5 is "1 2 3 5"
+    
+    maxSize = 2;
+    final CollectReporter reporter = mineFor("1", 5);
+    
+    final Object[][] expecteds = new Object[][] { {"1 2", 9}, {"1 3", 5}, {"1 5", 5}};
+    assertEqual(expecteds, reporter.itemsets);
+  }
+  
+  @Test
+  public void mine_Itemsets_With_Specific_Sizes() {
+    
+    prepareData_5();
+    
+    prepareExtensions("0", 3, 5, 8, 9);
+    
+    maxSize = 3;
+    minSize = 3;
+    final CollectReporter reporter = mineFor("0", 5);
+    
+    final Object[][] expecteds = new Object[][] { {"0 3 5", 5}, {"0 5 8", 5}, {"0 5 9", 5}, {"0 8 9", 9}};
+    // {"0 3 8", 5}, {"0 3 9", 5} are not expected because of closedness
     assertEqual(expecteds, reporter.itemsets);
   }
   
@@ -133,9 +180,17 @@ public class EclatMinerTest {
   private CollectReporter mineFor(final String prefixStr, final int minSup) {
     EclatMiner miner = new EclatMiner();
     int[] prefix = toIntArr(prefixStr);
-    
     final CollectReporter reporter = new CollectReporter();
     miner.setSetReporter(reporter);
+    
+    if (maxSize > 0) {
+      miner.setMaxSize(maxSize);
+    }
+    
+    if (minSize > 0) {
+      miner.setMinSize(minSize);
+    }
+    
     miner.mineRec(prefix, extensions, minSup);
     
 //    System.out.println("for " + prefixStr + ", " + minSup + ", " + extensions);
@@ -163,7 +218,7 @@ public class EclatMinerTest {
       }
       fail("Expected itemset is not found:" + expected[0] + " (" + expected[1] + ") ");
     }
-    assertTrue("There are more itemsets then expected!", actualItemsets.isEmpty());
+    assertTrue("There are more itemsets than expected!", actualItemsets.isEmpty());
   }
   
   private static String itemsetToStr(int[] itemset) {

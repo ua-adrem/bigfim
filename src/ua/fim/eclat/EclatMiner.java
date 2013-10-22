@@ -27,6 +27,8 @@ public class EclatMiner {
   }
   
   private SetReporter reporter;
+  private long maxSize = Long.MAX_VALUE;
+  private int minSize;
   
   public void setSetReporter(SetReporter setReporter) {
     this.reporter = setReporter;
@@ -88,9 +90,12 @@ public class EclatMiner {
       Item item1 = it1.next();
       int support = item1.freq();
       newPrefix[newPrefix.length - 1] = item1.id;
-      reporter.report(newPrefix, support, item1.getTids());
       
-      if (i < items.size() - 1) {
+      if (newPrefix.length >= minSize) {
+        reporter.report(newPrefix, support, item1.getTids());
+      }
+      
+      if (newPrefix.length < maxSize && i < items.size() - 1) {
         List<Item> newItems = new ArrayList<Item>(items.size() - i);
         ListIterator<Item> it2 = items.listIterator(i + 1);
         while (it2.hasNext()) {
@@ -203,5 +208,13 @@ public class EclatMiner {
     }
     reader.close();
     return items;
+  }
+  
+  public void setMaxSize(int maxSize) {
+    this.maxSize = maxSize;
+  }
+  
+  public void setMinSize(int minSize) {
+    this.minSize = minSize;
   }
 }
