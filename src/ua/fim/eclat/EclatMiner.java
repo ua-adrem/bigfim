@@ -45,22 +45,38 @@ public class EclatMiner {
   }
   
   /**
-   * Mines for frequent itemsets.
+   * Mines the sub prefix tree for frequent itemsets. items do not have to be conditioned, instead they should contain
+   * full TID's.
    * 
+   * @param item
+   *          Prefix of the tree to mine.
    * @param items
-   *          List of items with their TID lists.
+   *          List of items with their initial TID lists.
    * @param minSup
    *          Minimum support
    */
-  public void mineRec(List<Item> items, int minSup) {
+  public void mineRecByPruning(Item item, List<Item> items, int minSup) {
+    
+    ArrayList<Item> newItems = new ArrayList<Item>();
+    
     for (Iterator<Item> it = items.iterator(); it.hasNext();) {
-      Item item = it.next();
-      if (item.freq() < minSup) {
-        it.remove();
+      Item item_2 = it.next();
+      if (item.id == item_2.id) {
+        continue;
+      }
+      
+      int[] condTids = Tools.setDifference(item.getTids(), item_2.getTids());
+      
+      int newSupport = item.freq() - condTids.length;
+      if (newSupport >= minSup) {
+        Item newItem = new Item(item_2.id, newSupport, condTids);
+        newItems.add(newItem);
       }
     }
-    
-    declatRec(new int[0], items, minSup, true);
+    if (newItems.size() > 0) {
+      newItems.trimToSize();
+      declatRec(new int[] {item.id}, newItems, minSup, false);
+    }
   }
   
   /**
@@ -75,12 +91,7 @@ public class EclatMiner {
    *          Minimum support
    */
   public void mineRec(int[] prefix, List<Item> items, int minSup) {
-    if (prefix.length == 0) {
-      // Stand on the safe side.
-      mineRec(items, minSup);
-    } else {
-      declatRec(prefix, items, minSup, true);
-    }
+    declatRec(prefix, items, minSup, true);
   }
   
   private void declatRec(int[] prefix, List<Item> items, int minSup, boolean tidLists) {

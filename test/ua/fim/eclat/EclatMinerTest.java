@@ -44,19 +44,6 @@ public class EclatMinerTest {
   // @formatter:on
   
   @Test
-  public void finds_Frequent_Itemsets() {
-    
-    prepareData_5();
-    
-    extensions = items;
-    final CollectReporter reporter = mineFor("", 10);
-    
-    final Object[][] expecteds = new Object[][] { {"0", 10}, {"2", 11}, {"3", 11}, {"3 5", 10}, {"4", 11}, {"5", 11},
-        {"9", 10}};
-    assertEqual(expecteds, reporter.itemsets);
-  }
-  
-  @Test
   public void finds_Frequent_Itemsets_In_Conditional_Databases_1() {
     
     prepareData_5();

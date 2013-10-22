@@ -1,5 +1,6 @@
 package ua.fim.disteclat;
 
+import static java.lang.Integer.parseInt;
 import static org.apache.hadoop.filecache.DistributedCache.getLocalCacheFiles;
 import static ua.fim.configuration.Config.MIN_SUP_KEY;
 import static ua.fim.configuration.Config.PREFIX_LENGTH_KEY;
@@ -20,8 +21,9 @@ import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
-import ua.fim.disteclat.util.Item;
-import ua.fim.disteclat.util.SetReporter;
+import ua.fim.eclat.util.Item;
+import ua.fim.eclat.util.PrefixItemTIDsReporter;
+import ua.fim.eclat.util.SetReporter;
 import ua.hadoop.util.IntArrayWritable;
 
 /**
@@ -39,7 +41,7 @@ public class PrefixComputerMapper extends Mapper<LongWritable,Text,Text,IntArray
   public static final String Delimiter = "$";
   
   private List<Item> singletons;
-  private Map<String,Integer> orderMap;
+  private Map<Integer,Integer> orderMap;
   private int minSup;
   private int prefixLength;
   
@@ -77,16 +79,18 @@ public class PrefixComputerMapper extends Mapper<LongWritable,Text,Text,IntArray
     
     // if the prefix length is 1, just report the singletons, otherwise use
     // Eclat to find X-FIs seeds
-    EclatMiner miner = new EclatMiner();
-    SetReporter reporter = new SetReporter.PrefixItemTIDsReporter(context, prefixLength);
+    ua.fim.eclat.EclatMiner miner = new ua.fim.eclat.EclatMiner();
+    SetReporter reporter = new PrefixItemTIDsReporter(context, prefixLength, singletons, orderMap);
+    
     miner.setSetReporter(reporter);
     miner.setMaxSize(prefixLength);
+    miner.setMinSize(prefixLength);
     
-    for (String item : items.split(" ")) {
-      miner.mine(orderMap, singletons, item, minSup);
+    for (String itemStr : items.split(" ")) {
+      final Item item = singletons.get(orderMap.get(Integer.valueOf(itemStr)));
+      assert (item.id == parseInt(itemStr));
+      miner.mineRecByPruning(item, singletons, minSup);
     }
-    
-    miner.close();
   }
   
   /**
@@ -96,8 +100,8 @@ public class PrefixComputerMapper extends Mapper<LongWritable,Text,Text,IntArray
     Collections.sort(singletons, new Comparator<Item>() {
       @Override
       public int compare(Item o1, Item o2) {
-        Integer o1Rank = orderMap.get(o1.name);
-        Integer o2Rank = orderMap.get(o2.name);
+        Integer o1Rank = orderMap.get(o1.id);
+        Integer o2Rank = orderMap.get(o2.id);
         return o1Rank.compareTo(o2Rank);
       }
     });
