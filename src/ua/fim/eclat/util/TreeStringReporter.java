@@ -28,7 +28,8 @@ public class TreeStringReporter implements SetReporter {
   }
   
   @Override
-  public void report(int[] itemset, int support) {
+  public void report(int[] itemset, int support, int[] tids) {
+    
     if (prevSet == null) {
       for (int i = 0; i < itemset.length - 1; i++) {
         builder.append(itemset[i]).append(SEPARATOR);

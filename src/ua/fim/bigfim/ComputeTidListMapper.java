@@ -1,12 +1,13 @@
 package ua.fim.bigfim;
 
 import static org.apache.hadoop.filecache.DistributedCache.getLocalCacheFiles;
-import static ua.fim.bigfim.AprioriPhaseMapper.createLengthPlusOneWords;
+import static ua.fim.bigfim.AprioriPhaseMapper.convertLineToSet;
+import static ua.fim.bigfim.AprioriPhaseMapper.createLengthPlusOneItemsets;
+import static ua.fim.bigfim.AprioriPhaseMapper.readItemsetsFromFile;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -75,13 +76,13 @@ public class ComputeTidListMapper extends Mapper<LongWritable,Text,Text,IntArray
     Path[] localCacheFiles = getLocalCacheFiles(conf);
     if (localCacheFiles != null) {
       String filename = localCacheFiles[0].toString();
-      List<Set<Integer>> tmpWords = AprioriPhaseMapper.readWordsFromFile(filename);
+      List<Set<Integer>> freqItemsets = readItemsetsFromFile(filename);
       singletons = new HashSet<Integer>();
-      Set<SortedSet<Integer>> words = createLengthPlusOneWords(tmpWords, singletons);
+      Set<SortedSet<Integer>> candidates = createLengthPlusOneItemsets(freqItemsets, singletons);
       
-      countTrie = initializeCountTrie(words);
+      countTrie = initializeCountTrie(candidates);
       
-      phase = tmpWords.get(0).size() + 1;
+      phase = freqItemsets.get(0).size() + 1;
     }
     counter = 0;
     id = context.getTaskAttemptID().getTaskID().getId();
@@ -92,7 +93,7 @@ public class ComputeTidListMapper extends Mapper<LongWritable,Text,Text,IntArray
   @Override
   public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
     String line = value.toString();
-    List<Integer> items = AprioriPhaseMapper.convertLineToSet(line, phase == 1, singletons);
+    List<Integer> items = convertLineToSet(line, phase == 1, singletons);
     reportItemTids(context, items);
     counter++;
   }
@@ -104,13 +105,12 @@ public class ComputeTidListMapper extends Mapper<LongWritable,Text,Text,IntArray
     }
   }
   
-  private static Trie initializeCountTrie(Set<SortedSet<Integer>> words) {
+  private static Trie initializeCountTrie(Set<SortedSet<Integer>> itemsets) {
     Trie countTrie = new Trie(-1);
-    for (SortedSet<Integer> word : words) {
+    for (SortedSet<Integer> itemset : itemsets) {
       Trie trie = countTrie;
-      Iterator<Integer> it = word.iterator();
-      while (it.hasNext()) {
-        trie = trie.getChild(it.next());
+      for (int item : itemset) {
+        trie = trie.getChild(item);
       }
     }
     return countTrie;
@@ -122,8 +122,8 @@ public class ComputeTidListMapper extends Mapper<LongWritable,Text,Text,IntArray
     }
     
     if (phase == 1) {
-      for (Integer word : items) {
-        countTrie.getChild(word).addTid(counter);
+      for (Integer item : items) {
+        countTrie.getChild(item).addTid(counter);
         tidCounter++;
       }
     } else {
@@ -177,14 +177,5 @@ public class ComputeTidListMapper extends Mapper<LongWritable,Text,Text,IntArray
       }
       builder.setLength(length);
     }
-  }
-  
-  public static String setToMinusOneString(Set<Integer> set) {
-    StringBuilder builder = new StringBuilder();
-    Iterator<Integer> it = set.iterator();
-    for (int i = 0; i < set.size() - 1; i++) {
-      builder.append(it.next() + " ");
-    }
-    return builder.substring(0, builder.length() - 1);
   }
 }

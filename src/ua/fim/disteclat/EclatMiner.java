@@ -33,10 +33,6 @@ import ua.hadoop.util.IntArrayWritable;
 
 public class EclatMiner {
   
-  public static enum Version {
-    Eclat, DEclat
-  }
-  
   public static boolean closureCheck(Item newItem) {
     return newItem.getTids().length == 0;
   }

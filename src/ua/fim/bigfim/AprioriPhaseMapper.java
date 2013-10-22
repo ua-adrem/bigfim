@@ -72,9 +72,9 @@ public class AprioriPhaseMapper extends Mapper<LongWritable,Text,Text,IntWritabl
     countTrie = new Trie(-1);
     if (localCacheFiles != null) {
       String filename = localCacheFiles[0].toString();
-      List<Set<Integer>> tmpWords = readWordsFromFile(filename);
+      List<Set<Integer>> tmpWords = readItemsetsFromFile(filename);
       singletons = new HashSet<Integer>();
-      Set<SortedSet<Integer>> words = createLengthPlusOneWords(tmpWords, singletons);
+      Set<SortedSet<Integer>> words = createLengthPlusOneItemsets(tmpWords, singletons);
       
       phase = tmpWords.get(0).size() + 1;
       
@@ -162,7 +162,7 @@ public class AprioriPhaseMapper extends Mapper<LongWritable,Text,Text,IntWritabl
     
     List<Integer> items = new ArrayList<Integer>(itemsSplit.length);
     for (String itemString : itemsSplit) {
-      int item = Integer.parseInt(itemString);
+      Integer item = Integer.valueOf(itemString);
       if (!levelOne && !singletons.contains(item)) {
         continue;
       }
@@ -172,29 +172,29 @@ public class AprioriPhaseMapper extends Mapper<LongWritable,Text,Text,IntWritabl
     return items;
   }
   
-  public static Set<SortedSet<Integer>> createLengthPlusOneWords(List<Set<Integer>> tmpWords, Set<Integer> singletons) {
-    Set<SortedSet<Integer>> words = new HashSet<SortedSet<Integer>>();
+  public static Set<SortedSet<Integer>> createLengthPlusOneItemsets(List<Set<Integer>> tmpItemsets, Set<Integer> singletons) {
+    Set<SortedSet<Integer>> itemsets = new HashSet<SortedSet<Integer>>();
     
     int i = 0;
-    ListIterator<Set<Integer>> it1 = tmpWords.listIterator(i);
-    for (; i < tmpWords.size() - 1; i++) {
-      Set<Integer> word1 = it1.next();
-      ListIterator<Set<Integer>> it2 = tmpWords.listIterator(i + 1);
+    ListIterator<Set<Integer>> it1 = tmpItemsets.listIterator(i);
+    for (; i < tmpItemsets.size() - 1; i++) {
+      Set<Integer> itemset1 = it1.next();
+      ListIterator<Set<Integer>> it2 = tmpItemsets.listIterator(i + 1);
       while (it2.hasNext()) {
-        SortedSet<Integer> set = new TreeSet<Integer>(word1);
+        SortedSet<Integer> set = new TreeSet<Integer>(itemset1);
         set.addAll(it2.next());
-        if (set.size() == word1.size() + 1) {
-          words.add(set);
+        if (set.size() == itemset1.size() + 1) {
+          itemsets.add(set);
           singletons.addAll(set);
         }
       }
     }
     
-    return words;
+    return itemsets;
   }
   
-  public static List<Set<Integer>> readWordsFromFile(String string) throws NumberFormatException, IOException {
-    List<Set<Integer>> words = new ArrayList<Set<Integer>>();
+  public static List<Set<Integer>> readItemsetsFromFile(String string) throws NumberFormatException, IOException {
+    List<Set<Integer>> itemsets = new ArrayList<Set<Integer>>();
     
     String line;
     BufferedReader reader = new BufferedReader(new FileReader(string));
@@ -202,12 +202,12 @@ public class AprioriPhaseMapper extends Mapper<LongWritable,Text,Text,IntWritabl
       String[] splits = line.split("\t")[0].split(" ");
       Set<Integer> set = new HashSet<Integer>(splits.length);
       for (String split : splits) {
-        set.add(Integer.parseInt(split));
+        set.add(Integer.valueOf(split));
       }
-      words.add(set);
+      itemsets.add(set);
     }
     reader.close();
     
-    return words;
+    return itemsets;
   }
 }

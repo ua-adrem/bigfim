@@ -3,15 +3,17 @@ package ua.fim.eclat.util;
 import java.util.Arrays;
 
 public class Item {
-  public int id;
+  
+  public final int id;
   private final int support;
-  protected int[] tids;
+  protected final int[] tids;
   
   public Item(int id, int support, int[] tids) {
     this.id = id;
     this.support = support;
     this.tids = tids;
   }
+
   
   @Override
   public String toString() {

@@ -42,8 +42,43 @@ public class EclatMiner {
     }
   }
   
+  /**
+   * Mines for frequent itemsets.
+   * 
+   * @param items
+   *          List of items with their TID lists.
+   * @param minSup
+   *          Minimum support
+   */
+  public void mineRec(List<Item> items, int minSup) {
+    for (Iterator<Item> it = items.iterator(); it.hasNext();) {
+      Item item = it.next();
+      if (item.freq() < minSup) {
+        it.remove();
+      }
+    }
+    
+    declatRec(new int[0], items, minSup, true);
+  }
+  
+  /**
+   * Mines the sub prefix tree for frequent itemsets.
+   * 
+   * @param prefix
+   *          Prefix of the tree to mine.
+   * @param items
+   *          List of items with their conditional TID lists. All of the items should be frequent extensions of the
+   *          prefix, i.e., support of union of prefix and each item should be greater than or equal to minSup.
+   * @param minSup
+   *          Minimum support
+   */
   public void mineRec(int[] prefix, List<Item> items, int minSup) {
-    declatRec(prefix, items, minSup, true);
+    if (prefix.length == 0) {
+      // Stand on the safe side.
+      mineRec(items, minSup);
+    } else {
+      declatRec(prefix, items, minSup, true);
+    }
   }
   
   private void declatRec(int[] prefix, List<Item> items, int minSup, boolean tidLists) {
@@ -53,8 +88,7 @@ public class EclatMiner {
       Item item1 = it1.next();
       int support = item1.freq();
       newPrefix[newPrefix.length - 1] = item1.id;
-      
-      reporter.report(newPrefix, support);
+      reporter.report(newPrefix, support, item1.getTids());
       
       if (i < items.size() - 1) {
         List<Item> newItems = new ArrayList<Item>(items.size() - i);
@@ -87,7 +121,7 @@ public class EclatMiner {
     }
   }
   
-  public void mine(int[] prefix, List<Item> items, int minSup) {
+  private void mine(int[] prefix, List<Item> items, int minSup) {
     Queue<C> queue = new LinkedList<C>();
     queue.add(new C(prefix, items));
     declatNonRec(queue, minSup);
@@ -106,6 +140,7 @@ public class EclatMiner {
         int support = item1.freq();
         int[] newPrefix = Arrays.copyOf(prefix, prefix.length + 1);
         newPrefix[newPrefix.length - 1] = item1.id;
+        int[] tids1 = item1.getTids();
         
         if (i < items.size() - 1) {
           List<Item> newItems = new ArrayList<Item>(items.size() - i);
@@ -113,7 +148,6 @@ public class EclatMiner {
           while (it2.hasNext()) {
             Item item2 = it2.next();
             int[] condTids;
-            int[] tids1 = item1.getTids();
             int[] tids2 = item2.getTids();
             if (tidLists) {
               condTids = Tools.setDifference(tids1, tids2);
@@ -131,7 +165,7 @@ public class EclatMiner {
             queue.add(new C(newPrefix, newItems));
           }
         }
-        reporter.report(newPrefix, support);
+        reporter.report(newPrefix, support, Arrays.copyOf(tids1, tids1.length));
         
         if (closureCheck(item1)) {
           break;
@@ -141,7 +175,7 @@ public class EclatMiner {
     }
   }
   
-  private boolean closureCheck(Item item) {
+  private static boolean closureCheck(Item item) {
     return item.getTids().length == 0;
   }
   

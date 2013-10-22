@@ -22,7 +22,7 @@ public class ItemsetLengthCountReporter implements SetReporter {
   }
   
   @Override
-  public void report(int[] itemset, int support) {
+  public void report(int[] itemset, int support, int[] tids) {
     int size = itemset.length;
     AtomicLong count = counts.putIfAbsent(size, new AtomicLong());
     if (count == null) {

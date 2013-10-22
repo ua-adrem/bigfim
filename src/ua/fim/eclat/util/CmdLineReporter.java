@@ -1,15 +1,12 @@
 package ua.fim.eclat.util;
 
+import java.util.Arrays;
+
 public class CmdLineReporter implements SetReporter {
   
   @Override
-  public void report(int[] itemset, int support) {
-    StringBuilder builder = new StringBuilder();
-    for (int item : itemset) {
-      builder.append(item + " ");
-    }
-    builder.append("(" + support + ")");
-    System.out.println(builder.toString());
+  public void report(int[] itemset, int support, int[] tids) {
+    System.out.println(Arrays.toString(itemset));
   }
   
   @Override
