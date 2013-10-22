@@ -15,7 +15,7 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 
-import ua.fim.disteclat.util.TriePrinter;
+import ua.fim.eclat.util.TriePrinter;
 
 public class FimDriverTest {
   

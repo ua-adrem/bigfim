@@ -1,4 +1,6 @@
-package ua.fim.disteclat.util;
+package ua.fim.disteclat;
+
+import static java.lang.Integer.parseInt;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -19,14 +21,14 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 
 import ua.hadoop.util.IntArrayWritable;
-import ua.util.Tools;
 
 public class Utils {
   
-  public static List<Item> readTidLists(Configuration conf, Path path) throws IOException, URISyntaxException {
+  public static List<ua.fim.eclat.util.Item> readTidLists(Configuration conf, Path path) throws IOException,
+      URISyntaxException {
     SequenceFile.Reader r = new SequenceFile.Reader(FileSystem.get(new URI("file:///"), conf), path, conf);
     
-    List<Item> bitSets = new ArrayList<Item>();
+    List<ua.fim.eclat.util.Item> items = new ArrayList<ua.fim.eclat.util.Item>();
     
     Text key = new Text();
     IntArrayWritable value = new IntArrayWritable();
@@ -40,34 +42,25 @@ public class Utils {
         tids[i] = ((IntWritable) tidListsW[i]).get();
       }
       
-      bitSets.add(new Item(key.toString(), tids.length, tids));
+      items.add(new ua.fim.eclat.util.Item(parseInt(key.toString()), tids.length, tids));
     }
     r.close();
     
-    return bitSets;
+    return items;
   }
   
-  
-  public static Map<String,Integer> readSingletonsOrder(Path path) throws IOException {
+  public static Map<Integer,Integer> readSingletonsOrder(Path path) throws IOException {
     BufferedReader reader = new BufferedReader(new FileReader(path.toString()));
     
     String order = reader.readLine().trim();
     reader.close();
     
-    Map<String,Integer> orderMap = new HashMap<String,Integer>();
+    Map<Integer,Integer> orderMap = new HashMap<Integer,Integer>();
     String[] split = order.split(" ");
     int ix = 0;
     for (String item : split) {
-      orderMap.put(item, ix++);
+      orderMap.put(Integer.valueOf(item), ix++);
     }
     return orderMap;
-  }
-  
-  public static int[] intersect(Item item1, Item item2) {
-    return Tools.intersect(item1.tids, item2.tids);
-  }
-  
-  public static int[] setDifference(Item item1, Item item2) {
-    return Tools.setDifference(item1.tids, item2.tids);
   }
 }

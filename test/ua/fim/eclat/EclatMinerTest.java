@@ -180,10 +180,6 @@ public class EclatMinerTest {
     
     miner.mineRec(prefix, extensions, minSup);
     
-//    System.out.println("for " + prefixStr + ", " + minSup + ", " + extensions);
-//    for (Object[] is : reporter.itemsets) {
-//      System.out.println(Arrays.toString((int[]) is[0]) + " " + is[1]);
-//    }
     return reporter;
   }
   
@@ -279,10 +275,9 @@ public class EclatMinerTest {
     }
     
     @Override
-    public void report(int[] itemset, int support, int[] tids) {
+    public void report(int[] itemset, int support) {
       final int[] itemset1 = copyOf(itemset, itemset.length);
-      final int[] tids1 = copyOf(tids, tids.length);
-      itemsets.add(new Object[] {itemset1, Integer.valueOf(support), tids1});
+      itemsets.add(new Object[] {itemset1, Integer.valueOf(support)});
     }
   }
 }

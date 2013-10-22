@@ -1,9 +1,9 @@
 package ua.fim.eclat.util;
 
-import static ua.fim.disteclat.util.TriePrinter.CLOSESUP;
-import static ua.fim.disteclat.util.TriePrinter.OPENSUP;
-import static ua.fim.disteclat.util.TriePrinter.SEPARATOR;
-import static ua.fim.disteclat.util.TriePrinter.SYMBOL;
+import static ua.fim.eclat.util.TriePrinter.CLOSESUP;
+import static ua.fim.eclat.util.TriePrinter.OPENSUP;
+import static ua.fim.eclat.util.TriePrinter.SEPARATOR;
+import static ua.fim.eclat.util.TriePrinter.SYMBOL;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -28,7 +28,7 @@ public class TreeStringReporter implements SetReporter {
   }
   
   @Override
-  public void report(int[] itemset, int support, int[] tids) {
+  public void report(int[] itemset, int support) {
     
     if (prevSet == null) {
       for (int i = 0; i < itemset.length - 1; i++) {

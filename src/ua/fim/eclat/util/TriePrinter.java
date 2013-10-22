@@ -1,4 +1,4 @@
-package ua.fim.disteclat.util;
+package ua.fim.eclat.util;
 
 import java.io.BufferedReader;
 import java.io.File;

@@ -29,7 +29,7 @@ public class PrefixItemTIDsReporter implements SetReporter {
   }
   
   @Override
-  public void report(int[] itemset, int support, int[] tids2) {
+  public void report(int[] itemset, int support) {
     StringBuilder sb = new StringBuilder();
     if (itemset.length < prefixLength) {
       System.out.println("Found a short fis:" + Arrays.toString(itemset));

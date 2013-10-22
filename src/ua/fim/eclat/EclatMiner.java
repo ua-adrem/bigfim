@@ -103,7 +103,7 @@ public class EclatMiner {
       newPrefix[newPrefix.length - 1] = item1.id;
       
       if (newPrefix.length >= minSize) {
-        reporter.report(newPrefix, support, item1.getTids());
+        reporter.report(newPrefix, support);
       }
       
       if (newPrefix.length < maxSize && i < items.size() - 1) {
@@ -181,7 +181,7 @@ public class EclatMiner {
             queue.add(new C(newPrefix, newItems));
           }
         }
-        reporter.report(newPrefix, support, Arrays.copyOf(tids1, tids1.length));
+        reporter.report(newPrefix, support);
         
         if (closureCheck(item1)) {
           break;

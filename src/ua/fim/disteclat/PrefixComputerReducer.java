@@ -27,13 +27,17 @@ public class PrefixComputerReducer extends Reducer<Text,IntArrayWritable,IntArra
   private static int MAX_FILE_SIZE = 1000000000;
   private static int MAX_NUMBER_OF_TIDS = (int) ((MAX_FILE_SIZE / 4) * 0.7);
   
-  private static IntArrayWritable emptyIaw;
+  private static final IntArrayWritable EmptyIaw;
   
   private int minSup;
   
   private List<AtomicInteger> bucketSizes;
   
   private MultipleOutputs<IntArrayWritable,IntArrayWritable> mos;
+  
+  static {
+    EmptyIaw = new IntArrayWritable(new IntWritable[0]);
+  }
   
   @Override
   public void setup(Context context) {
@@ -48,8 +52,6 @@ public class PrefixComputerReducer extends Reducer<Text,IntArrayWritable,IntArra
     
     mos = new MultipleOutputs<IntArrayWritable,IntArrayWritable>(context);
     
-    IntWritable[] iw = new IntWritable[0];
-    emptyIaw = new IntArrayWritable(iw);
   }
   
   @Override
@@ -94,7 +96,7 @@ public class PrefixComputerReducer extends Reducer<Text,IntArrayWritable,IntArra
     bucketSizes.get(lowestBucket).addAndGet(totalTids);
     
     String baseOutputPath = "bucket-" + lowestBucket;
-    mos.write(convert(key.toString()), emptyIaw, baseOutputPath);
+    mos.write(convert(key.toString()), EmptyIaw, baseOutputPath);
     for (Entry<Integer,List<Integer>> entry : map.entrySet()) {
       if (entry.getValue().size() >= minSup) {
         IntArrayWritable owKey = convert(entry.getKey());
@@ -102,7 +104,7 @@ public class PrefixComputerReducer extends Reducer<Text,IntArrayWritable,IntArra
         mos.write(owKey, owValue, baseOutputPath);
       }
     }
-    mos.write(emptyIaw, emptyIaw, baseOutputPath);
+    mos.write(EmptyIaw, EmptyIaw, baseOutputPath);
   }
   
   private static boolean checkLowestBucket(int lowestBucket, int totalTids) {

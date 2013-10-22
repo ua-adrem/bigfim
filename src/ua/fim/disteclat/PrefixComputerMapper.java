@@ -6,8 +6,8 @@ import static ua.fim.configuration.Config.MIN_SUP_KEY;
 import static ua.fim.configuration.Config.PREFIX_LENGTH_KEY;
 import static ua.fim.disteclat.DistEclatDriver.OSingletonsOrder;
 import static ua.fim.disteclat.DistEclatDriver.OSingletonsTids;
-import static ua.fim.disteclat.util.Utils.readSingletonsOrder;
-import static ua.fim.disteclat.util.Utils.readTidLists;
+import static ua.fim.disteclat.Utils.readSingletonsOrder;
+import static ua.fim.disteclat.Utils.readTidLists;
 
 import java.io.IOException;
 import java.util.Collections;

@@ -1,4 +1,4 @@
-package ua.fim.disteclat.util;
+package ua.fim.eclat.util;
 
 import static org.junit.Assert.assertArrayEquals;
 
