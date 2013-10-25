@@ -7,12 +7,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedSet;
@@ -25,37 +23,15 @@ import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
+import ua.util.Trie;
+
+/**
+ * Mapper class for Apriori phase of BigFim. In this phase a list of base words are combined in words of length+1. The
+ * latter are counted in the map function. If no base words are specified, all singletons are counted.
+ * 
+ * @author Sandy Moens & Emin Aksehirli
+ */
 public class AprioriPhaseMapper extends Mapper<LongWritable,Text,Text,IntWritable> {
-  
-  public static class Trie {
-    public int id;
-    public int support;
-    public Map<Integer,Trie> children;
-    
-    public Trie(int id) {
-      this.id = id;
-      support = 0;
-      children = new HashMap<Integer,Trie>();
-    }
-    
-    public Trie getChild(int id) {
-      Trie child = children.get(id);
-      if (child == null) {
-        child = new Trie(id);
-        children.put(id, child);
-      }
-      return child;
-    }
-    
-    public void incrementSupport() {
-      this.support++;
-    }
-    
-    @Override
-    public String toString() {
-      return "[" + id + "(" + support + "):" + children + "]";
-    }
-  }
   
   private static final String ItemDelimiter = " ";
   
@@ -73,8 +49,8 @@ public class AprioriPhaseMapper extends Mapper<LongWritable,Text,Text,IntWritabl
     if (localCacheFiles != null) {
       String filename = localCacheFiles[0].toString();
       List<Set<Integer>> tmpWords = readItemsetsFromFile(filename);
-      singletons = new HashSet<Integer>();
-      Set<SortedSet<Integer>> words = createLengthPlusOneItemsets(tmpWords, singletons);
+      Set<SortedSet<Integer>> words = createLengthPlusOneItemsets(tmpWords);
+      singletons = getSingletonsFromWords(words);
       
       phase = tmpWords.get(0).size() + 1;
       
@@ -83,18 +59,6 @@ public class AprioriPhaseMapper extends Mapper<LongWritable,Text,Text,IntWritabl
       System.out.println("Singletons: " + singletons.size());
       System.out.println("Words: " + words.size());
     }
-  }
-  
-  private static Trie initializeCountTrie(Set<SortedSet<Integer>> words) {
-    Trie countTrie = new Trie(-1);
-    for (SortedSet<Integer> word : words) {
-      Trie trie = countTrie;
-      Iterator<Integer> it = word.iterator();
-      while (it.hasNext()) {
-        trie = trie.getChild(it.next());
-      }
-    }
-    return countTrie;
   }
   
   @Override
@@ -112,6 +76,18 @@ public class AprioriPhaseMapper extends Mapper<LongWritable,Text,Text,IntWritabl
     recReport(context, new StringBuilder(), countTrie);
   }
   
+  private static Trie initializeCountTrie(Set<SortedSet<Integer>> words) {
+    Trie countTrie = new Trie(-1);
+    for (SortedSet<Integer> word : words) {
+      Trie trie = countTrie;
+      Iterator<Integer> it = word.iterator();
+      while (it.hasNext()) {
+        trie = trie.getChild(it.next());
+      }
+    }
+    return countTrie;
+  }
+
   private void recReport(Context context, StringBuilder builder, Trie trie) throws IOException, InterruptedException {
     int length = builder.length();
     for (Entry<Integer,Trie> entry : trie.children.entrySet()) {
@@ -172,7 +148,14 @@ public class AprioriPhaseMapper extends Mapper<LongWritable,Text,Text,IntWritabl
     return items;
   }
   
-  public static Set<SortedSet<Integer>> createLengthPlusOneItemsets(List<Set<Integer>> tmpItemsets, Set<Integer> singletons) {
+  /**
+   * Creates words of length equal to length+1
+   * 
+   * @param tmpItemsets
+   *          words of length that are merged together to form length+1 words
+   * @return
+   */
+  public static Set<SortedSet<Integer>> createLengthPlusOneItemsets(List<Set<Integer>> tmpItemsets) {
     Set<SortedSet<Integer>> itemsets = new HashSet<SortedSet<Integer>>();
     
     int i = 0;
@@ -185,12 +168,26 @@ public class AprioriPhaseMapper extends Mapper<LongWritable,Text,Text,IntWritabl
         set.addAll(it2.next());
         if (set.size() == itemset1.size() + 1) {
           itemsets.add(set);
-          singletons.addAll(set);
         }
       }
     }
     
     return itemsets;
+  }
+  
+  /**
+   * Gets the unique list of singletons in a collection of words
+   * 
+   * @param words
+   *          the collection of words
+   * @return list of unique singletons
+   */
+  public static Set<Integer> getSingletonsFromWords(Set<SortedSet<Integer>> words) {
+    Set<Integer> singletons = new HashSet<Integer>();
+    for (SortedSet<Integer> word : words) {
+      singletons.addAll(word);
+    }
+    return singletons;
   }
   
   public static List<Set<Integer>> readItemsetsFromFile(String string) throws NumberFormatException, IOException {

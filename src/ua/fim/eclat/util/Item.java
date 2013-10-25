@@ -15,11 +15,6 @@ public class Item {
   }
 
   
-  @Override
-  public String toString() {
-    return id + " (" + freq() + ")" + " [" + tids.length + "]";
-  }
-  
   public int freq() {
     return support;
   }
@@ -28,6 +23,12 @@ public class Item {
     return tids;
   }
   
+  @Override
+  public String toString() {
+    return id + " (" + freq() + ")" + " [" + tids.length + "]";
+  }
+
+
   @Override
   public int hashCode() {
     return id;

@@ -7,7 +7,6 @@ import static ua.fim.bigfim.AprioriPhaseMapper.readItemsetsFromFile;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -77,8 +76,8 @@ public class ComputeTidListMapper extends Mapper<LongWritable,Text,Text,IntArray
     if (localCacheFiles != null) {
       String filename = localCacheFiles[0].toString();
       List<Set<Integer>> freqItemsets = readItemsetsFromFile(filename);
-      singletons = new HashSet<Integer>();
-      Set<SortedSet<Integer>> candidates = createLengthPlusOneItemsets(freqItemsets, singletons);
+      Set<SortedSet<Integer>> candidates = createLengthPlusOneItemsets(freqItemsets);
+      singletons = AprioriPhaseMapper.getSingletonsFromWords(candidates);
       
       countTrie = initializeCountTrie(candidates);
       
