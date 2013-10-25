@@ -1,8 +1,8 @@
 package ua.fim.bigfim;
 
 import static org.easymock.EasyMock.createMock;
+import static ua.fim.AllTests.setField;
 
-import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,25 +16,6 @@ import org.junit.Test;
 import ua.util.Trie;
 
 public class AprioriPhaseMapperTest {
-  
-  protected static void setField(Object target, String fieldname, Object value) throws NoSuchFieldException,
-      IllegalAccessException {
-    Field field = findDeclaredField(target.getClass(), fieldname);
-    field.setAccessible(true);
-    field.set(target, value);
-  }
-  
-  private static Field findDeclaredField(Class<?> inClass, String fieldname) throws NoSuchFieldException {
-    while (!Object.class.equals(inClass)) {
-      for (Field field : inClass.getDeclaredFields()) {
-        if (field.getName().equalsIgnoreCase(fieldname)) {
-          return field;
-        }
-      }
-      inClass = inClass.getSuperclass();
-    }
-    throw new NoSuchFieldException();
-  }
   
   private static Set<Integer> create_Set_1() {
     Set<Integer> set = new HashSet<Integer>();
