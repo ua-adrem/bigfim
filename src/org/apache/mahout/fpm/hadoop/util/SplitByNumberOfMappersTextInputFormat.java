@@ -1,4 +1,4 @@
-package ua.hadoop.util;
+package org.apache.mahout.fpm.hadoop.util;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,8 +19,7 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 import org.apache.hadoop.mapreduce.lib.input.LineRecordReader;
 import org.apache.hadoop.util.LineReader;
-
-import ua.fim.configuration.Config;
+import org.apache.mahout.fpm.util.Config;
 
 /**
  * Input format that splits a file in a number of chunks given by Config.NUMBER_OF_MAPPERS_KEY.

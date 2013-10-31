@@ -1,4 +1,4 @@
-package ua.fim.configuration;
+package org.apache.mahout.fpm.util;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -7,7 +7,7 @@ import java.io.InputStreamReader;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import ua.fim.FimDriver.FimVersion;
+import org.apache.mahout.fpm.FimDriver.FimVersion;
 
 /**
  * Configuration for Dist-Eclat and BigFIM algorithms

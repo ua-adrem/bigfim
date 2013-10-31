@@ -1,7 +1,7 @@
-package ua.fim.bigfim;
+package org.apache.mahout.fpm.bigfim;
 
+import static org.apache.mahout.fpm.AllTests.setField;
 import static org.easymock.EasyMock.createMock;
-import static ua.fim.AllTests.setField;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -10,10 +10,9 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.mahout.fpm.util.Trie;
 import org.easymock.EasyMock;
 import org.junit.Test;
-
-import ua.util.Trie;
 
 public class AprioriPhaseMapperTest {
   

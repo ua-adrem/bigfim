@@ -1,4 +1,4 @@
-package ua.fim.eclat;
+package org.apache.mahout.fpm.eclat;
 
 import java.io.IOException;
 

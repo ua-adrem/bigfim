@@ -1,4 +1,4 @@
-package ua.fim.eclat;
+package org.apache.mahout.fpm.eclat;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -12,10 +12,10 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Queue;
 
-import ua.fim.eclat.util.CmdLineReporter;
-import ua.fim.eclat.util.Item;
-import ua.fim.eclat.util.SetReporter;
-import ua.util.Tools;
+import org.apache.mahout.fpm.eclat.util.CmdLineReporter;
+import org.apache.mahout.fpm.eclat.util.Item;
+import org.apache.mahout.fpm.eclat.util.SetReporter;
+import org.apache.mahout.fpm.util.Tools;
 
 public class EclatMiner {
   

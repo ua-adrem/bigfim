@@ -1,4 +1,4 @@
-package ua.fim;
+package org.apache.mahout.fpm;
 
 import static org.junit.Assert.fail;
 
@@ -12,10 +12,9 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 
+import org.apache.mahout.fpm.eclat.util.TriePrinter;
 import org.junit.Before;
 import org.junit.Test;
-
-import ua.fim.eclat.util.TriePrinter;
 
 public class FimDriverTest {
   

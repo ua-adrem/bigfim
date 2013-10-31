@@ -1,9 +1,9 @@
-package ua.fim.eclat.util;
+package org.apache.mahout.fpm.eclat.util;
 
-import static ua.fim.eclat.util.TriePrinter.CLOSESUP;
-import static ua.fim.eclat.util.TriePrinter.OPENSUP;
-import static ua.fim.eclat.util.TriePrinter.SEPARATOR;
-import static ua.fim.eclat.util.TriePrinter.SYMBOL;
+import static org.apache.mahout.fpm.eclat.util.TriePrinter.CLOSESUP;
+import static org.apache.mahout.fpm.eclat.util.TriePrinter.OPENSUP;
+import static org.apache.mahout.fpm.eclat.util.TriePrinter.SEPARATOR;
+import static org.apache.mahout.fpm.eclat.util.TriePrinter.SYMBOL;
 
 import java.io.IOException;
 import java.util.Arrays;

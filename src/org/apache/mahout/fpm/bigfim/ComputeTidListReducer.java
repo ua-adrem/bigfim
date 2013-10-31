@@ -1,8 +1,8 @@
-package ua.fim.bigfim;
+package org.apache.mahout.fpm.bigfim;
 
-import static ua.fim.configuration.Config.MIN_SUP_KEY;
-import static ua.fim.configuration.Config.NUMBER_OF_MAPPERS_KEY;
-import static ua.fim.configuration.Config.SUBDB_SIZE;
+import static org.apache.mahout.fpm.util.Config.MIN_SUP_KEY;
+import static org.apache.mahout.fpm.util.Config.NUMBER_OF_MAPPERS_KEY;
+import static org.apache.mahout.fpm.util.Config.SUBDB_SIZE;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,8 +19,7 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.output.MultipleOutputs;
-
-import ua.hadoop.util.IntArrayWritable;
+import org.apache.mahout.fpm.hadoop.util.IntArrayWritable;
 
 public class ComputeTidListReducer extends Reducer<Text,IntArrayWritable,IntArrayWritable,IntArrayWritable> {
   

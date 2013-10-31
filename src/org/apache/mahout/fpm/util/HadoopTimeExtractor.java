@@ -1,4 +1,4 @@
-package ua.util;
+package org.apache.mahout.fpm.util;
 
 import static java.lang.Integer.parseInt;
 

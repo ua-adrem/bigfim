@@ -1,14 +1,14 @@
-package ua.fim.bigfim;
+package org.apache.mahout.fpm.bigfim;
 
 import static java.io.File.separator;
-import static ua.fim.configuration.Config.CLOSED_SETS_OPTIMIZATION_KEY;
-import static ua.fim.configuration.Config.MAPRED_TASK_TIMEOUT_KEY;
-import static ua.fim.configuration.Config.MIN_SUP_KEY;
-import static ua.fim.configuration.Config.NUMBER_OF_LINES_KEY;
-import static ua.fim.configuration.Config.NUMBER_OF_MAPPERS_KEY;
-import static ua.fim.configuration.Config.PREFIX_LENGTH_KEY;
-import static ua.fim.configuration.Config.WRITE_SETS_KEY;
-import static ua.hadoop.util.Tools.cleanDirs;
+import static org.apache.mahout.fpm.hadoop.util.Tools.cleanDirs;
+import static org.apache.mahout.fpm.util.Config.CLOSED_SETS_OPTIMIZATION_KEY;
+import static org.apache.mahout.fpm.util.Config.MAPRED_TASK_TIMEOUT_KEY;
+import static org.apache.mahout.fpm.util.Config.MIN_SUP_KEY;
+import static org.apache.mahout.fpm.util.Config.NUMBER_OF_LINES_KEY;
+import static org.apache.mahout.fpm.util.Config.NUMBER_OF_MAPPERS_KEY;
+import static org.apache.mahout.fpm.util.Config.PREFIX_LENGTH_KEY;
+import static org.apache.mahout.fpm.util.Config.WRITE_SETS_KEY;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -35,15 +35,14 @@ import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
-
-import ua.fim.configuration.Config;
-import ua.fim.eclat.EclatMinerMapper;
-import ua.fim.eclat.EclatMinerMapperSetCount;
-import ua.fim.eclat.EclatMinerReducer;
-import ua.fim.eclat.EclatMinerReducerSetCount;
-import ua.hadoop.util.IntArrayWritable;
-import ua.hadoop.util.NoSplitSequenceFileInputFormat;
-import ua.hadoop.util.SplitByNumberOfMappersTextInputFormat;
+import org.apache.mahout.fpm.eclat.EclatMinerMapper;
+import org.apache.mahout.fpm.eclat.EclatMinerMapperSetCount;
+import org.apache.mahout.fpm.eclat.EclatMinerReducer;
+import org.apache.mahout.fpm.eclat.EclatMinerReducerSetCount;
+import org.apache.mahout.fpm.hadoop.util.IntArrayWritable;
+import org.apache.mahout.fpm.hadoop.util.NoSplitSequenceFileInputFormat;
+import org.apache.mahout.fpm.hadoop.util.SplitByNumberOfMappersTextInputFormat;
+import org.apache.mahout.fpm.util.Config;
 
 public class BigFIMDriver extends Configured implements Tool {
   

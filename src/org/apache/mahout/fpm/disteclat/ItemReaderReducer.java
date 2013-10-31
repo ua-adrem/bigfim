@@ -1,10 +1,10 @@
-package ua.fim.disteclat;
+package org.apache.mahout.fpm.disteclat;
 
 import static java.lang.Integer.parseInt;
-import static ua.fim.configuration.Config.NUMBER_OF_MAPPERS_KEY;
-import static ua.fim.disteclat.DistEclatDriver.OSingletonsDistribution;
-import static ua.fim.disteclat.DistEclatDriver.OSingletonsOrder;
-import static ua.fim.disteclat.DistEclatDriver.OSingletonsTids;
+import static org.apache.mahout.fpm.disteclat.DistEclatDriver.OSingletonsDistribution;
+import static org.apache.mahout.fpm.disteclat.DistEclatDriver.OSingletonsOrder;
+import static org.apache.mahout.fpm.disteclat.DistEclatDriver.OSingletonsTids;
+import static org.apache.mahout.fpm.util.Config.NUMBER_OF_MAPPERS_KEY;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,8 +19,7 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.output.MultipleOutputs;
-
-import ua.hadoop.util.IntArrayWritable;
+import org.apache.mahout.fpm.hadoop.util.IntArrayWritable;
 
 /**
  * This class implements the Reducer for the first MapReduce cycle for Dist-Eclat. It receives the complete set of

@@ -1,6 +1,6 @@
-package ua.fim.disteclat;
+package org.apache.mahout.fpm.disteclat;
 
-import static ua.fim.configuration.Config.MIN_SUP_KEY;
+import static org.apache.mahout.fpm.util.Config.MIN_SUP_KEY;
 
 import java.io.IOException;
 
@@ -9,8 +9,7 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
-
-import ua.hadoop.util.IntArrayWritable;
+import org.apache.mahout.fpm.hadoop.util.IntArrayWritable;
 
 /**
  * This class implements the Mapper for the first MapReduce cycle for Dist-Eclat.It reads the database in vertical

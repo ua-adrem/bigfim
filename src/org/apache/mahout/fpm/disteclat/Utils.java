@@ -1,4 +1,4 @@
-package ua.fim.disteclat;
+package org.apache.mahout.fpm.disteclat;
 
 import static java.lang.Integer.parseInt;
 
@@ -19,16 +19,15 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
-
-import ua.hadoop.util.IntArrayWritable;
+import org.apache.mahout.fpm.eclat.util.Item;
+import org.apache.mahout.fpm.hadoop.util.IntArrayWritable;
 
 public class Utils {
   
-  public static List<ua.fim.eclat.util.Item> readTidLists(Configuration conf, Path path) throws IOException,
-      URISyntaxException {
+  public static List<Item> readTidLists(Configuration conf, Path path) throws IOException, URISyntaxException {
     SequenceFile.Reader r = new SequenceFile.Reader(FileSystem.get(new URI("file:///"), conf), path, conf);
     
-    List<ua.fim.eclat.util.Item> items = new ArrayList<ua.fim.eclat.util.Item>();
+    List<Item> items = new ArrayList<Item>();
     
     Text key = new Text();
     IntArrayWritable value = new IntArrayWritable();
@@ -42,7 +41,7 @@ public class Utils {
         tids[i] = ((IntWritable) tidListsW[i]).get();
       }
       
-      items.add(new ua.fim.eclat.util.Item(parseInt(key.toString()), tids.length, tids));
+      items.add(new Item(parseInt(key.toString()), tids.length, tids));
     }
     r.close();
     

@@ -1,4 +1,4 @@
-package ua.hadoop.util;
+package org.apache.mahout.fpm.hadoop.util;
 
 import org.apache.hadoop.io.ArrayWritable;
 import org.apache.hadoop.io.IntWritable;

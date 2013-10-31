@@ -1,4 +1,4 @@
-package ua.fim.bigfim;
+package org.apache.mahout.fpm.bigfim;
 
 import java.io.IOException;
 
@@ -7,8 +7,7 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.Reducer;
-
-import ua.fim.configuration.Config;
+import org.apache.mahout.fpm.util.Config;
 
 public class AprioriPhaseReducer extends Reducer<Text,IntWritable,Text,Writable> {
   

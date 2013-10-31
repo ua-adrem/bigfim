@@ -1,9 +1,8 @@
-package ua.fim.eclat;
+package org.apache.mahout.fpm.eclat;
 
 import org.apache.hadoop.io.LongWritable;
-
-import ua.fim.eclat.util.ItemsetLengthCountReporter;
-import ua.fim.eclat.util.SetReporter;
+import org.apache.mahout.fpm.eclat.util.ItemsetLengthCountReporter;
+import org.apache.mahout.fpm.eclat.util.SetReporter;
 
 public class EclatMinerMapperSetCount extends EclatMinerMapperBase<LongWritable> {
   

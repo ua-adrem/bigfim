@@ -1,9 +1,9 @@
-package ua.fim.bigfim;
+package org.apache.mahout.fpm.bigfim;
 
 import static org.apache.hadoop.filecache.DistributedCache.getLocalCacheFiles;
-import static ua.fim.bigfim.AprioriPhaseMapper.convertLineToSet;
-import static ua.fim.bigfim.AprioriPhaseMapper.createLengthPlusOneItemsets;
-import static ua.fim.bigfim.AprioriPhaseMapper.readItemsetsFromFile;
+import static org.apache.mahout.fpm.bigfim.AprioriPhaseMapper.convertLineToSet;
+import static org.apache.mahout.fpm.bigfim.AprioriPhaseMapper.createLengthPlusOneItemsets;
+import static org.apache.mahout.fpm.bigfim.AprioriPhaseMapper.readItemsetsFromFile;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -19,8 +19,7 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
-
-import ua.hadoop.util.IntArrayWritable;
+import org.apache.mahout.fpm.hadoop.util.IntArrayWritable;
 
 public class ComputeTidListMapper extends Mapper<LongWritable,Text,Text,IntArrayWritable> {
   

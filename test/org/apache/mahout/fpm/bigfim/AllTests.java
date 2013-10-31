@@ -1,4 +1,4 @@
-package ua.fim.bigfim;
+package org.apache.mahout.fpm.bigfim;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

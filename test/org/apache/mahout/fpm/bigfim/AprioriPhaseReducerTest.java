@@ -1,4 +1,4 @@
-package ua.fim.bigfim;
+package org.apache.mahout.fpm.bigfim;
 
 import static org.easymock.EasyMock.createMock;
 
@@ -8,10 +8,9 @@ import java.util.List;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.mahout.fpm.AllTests;
 import org.easymock.EasyMock;
 import org.junit.Test;
-
-import ua.fim.AllTests;
 
 public class AprioriPhaseReducerTest {
   

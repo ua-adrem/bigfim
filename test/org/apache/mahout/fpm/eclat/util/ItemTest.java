@@ -1,4 +1,4 @@
-package ua.fim.eclat.util;
+package org.apache.mahout.fpm.eclat.util;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;

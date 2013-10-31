@@ -1,4 +1,4 @@
-package ua.hadoop.util;
+package org.apache.mahout.fpm.hadoop.util;
 
 import java.io.IOException;
 

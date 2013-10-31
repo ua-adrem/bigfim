@@ -1,6 +1,6 @@
-package ua.fim.eclat;
+package org.apache.mahout.fpm.eclat;
 
-import static ua.fim.configuration.Config.MIN_SUP_KEY;
+import static org.apache.mahout.fpm.util.Config.MIN_SUP_KEY;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -12,10 +12,9 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.Mapper;
-
-import ua.fim.eclat.util.Item;
-import ua.fim.eclat.util.SetReporter;
-import ua.hadoop.util.IntArrayWritable;
+import org.apache.mahout.fpm.eclat.util.Item;
+import org.apache.mahout.fpm.eclat.util.SetReporter;
+import org.apache.mahout.fpm.hadoop.util.IntArrayWritable;
 
 public abstract class EclatMinerMapperBase<VALUEOUT> extends Mapper<IntArrayWritable,IntArrayWritable,Text,VALUEOUT> {
   

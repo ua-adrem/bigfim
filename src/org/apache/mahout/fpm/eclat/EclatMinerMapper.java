@@ -1,9 +1,8 @@
-package ua.fim.eclat;
+package org.apache.mahout.fpm.eclat;
 
 import org.apache.hadoop.io.Text;
-
-import ua.fim.eclat.util.TreeStringReporter;
-import ua.fim.eclat.util.SetReporter;
+import org.apache.mahout.fpm.eclat.util.SetReporter;
+import org.apache.mahout.fpm.eclat.util.TreeStringReporter;
 
 public class EclatMinerMapper extends EclatMinerMapperBase<Text> {
   

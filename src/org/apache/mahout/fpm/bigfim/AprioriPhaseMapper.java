@@ -1,4 +1,4 @@
-package ua.fim.bigfim;
+package org.apache.mahout.fpm.bigfim;
 
 import static org.apache.hadoop.filecache.DistributedCache.getLocalCacheFiles;
 
@@ -22,8 +22,7 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
-
-import ua.util.Trie;
+import org.apache.mahout.fpm.util.Trie;
 
 /**
  * Mapper class for Apriori phase of BigFim. In this phase a list of base words are combined in words of length+1. The

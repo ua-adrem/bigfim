@@ -1,8 +1,8 @@
-package ua.fim;
+package org.apache.mahout.fpm;
 
-import ua.fim.bigfim.BigFIMDriver;
-import ua.fim.configuration.Config;
-import ua.fim.disteclat.DistEclatDriver;
+import org.apache.mahout.fpm.bigfim.BigFIMDriver;
+import org.apache.mahout.fpm.disteclat.DistEclatDriver;
+import org.apache.mahout.fpm.util.Config;
 
 /**
  * Driver class for BigData algorithms and tools

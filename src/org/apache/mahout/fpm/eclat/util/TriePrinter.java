@@ -1,4 +1,4 @@
-package ua.fim.eclat.util;
+package org.apache.mahout.fpm.eclat.util;
 
 import java.io.BufferedReader;
 import java.io.File;

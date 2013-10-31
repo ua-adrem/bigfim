@@ -1,23 +1,21 @@
-package ua.fim.eclat;
+package org.apache.mahout.fpm.eclat;
 
 import static java.lang.Integer.parseInt;
 import static java.util.Arrays.copyOf;
 import static java.util.Collections.unmodifiableList;
+import static org.apache.mahout.fpm.util.Tools.intersect;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static ua.util.Tools.intersect;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.mahout.fpm.eclat.util.Item;
+import org.apache.mahout.fpm.eclat.util.SetReporter;
 import org.junit.Test;
-
-import ua.fim.eclat.util.Item;
-import ua.fim.eclat.util.SetReporter;
 
 public class EclatMinerTest {
   

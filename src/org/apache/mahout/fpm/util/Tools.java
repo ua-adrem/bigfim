@@ -1,4 +1,4 @@
-package ua.util;
+package org.apache.mahout.fpm.util;
 
 import java.util.ArrayList;
 import java.util.List;

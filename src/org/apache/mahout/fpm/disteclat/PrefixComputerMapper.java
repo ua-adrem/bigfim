@@ -1,13 +1,13 @@
-package ua.fim.disteclat;
+package org.apache.mahout.fpm.disteclat;
 
 import static java.lang.Integer.parseInt;
 import static org.apache.hadoop.filecache.DistributedCache.getLocalCacheFiles;
-import static ua.fim.configuration.Config.MIN_SUP_KEY;
-import static ua.fim.configuration.Config.PREFIX_LENGTH_KEY;
-import static ua.fim.disteclat.DistEclatDriver.OSingletonsOrder;
-import static ua.fim.disteclat.DistEclatDriver.OSingletonsTids;
-import static ua.fim.disteclat.Utils.readSingletonsOrder;
-import static ua.fim.disteclat.Utils.readTidLists;
+import static org.apache.mahout.fpm.disteclat.DistEclatDriver.OSingletonsOrder;
+import static org.apache.mahout.fpm.disteclat.DistEclatDriver.OSingletonsTids;
+import static org.apache.mahout.fpm.disteclat.Utils.readSingletonsOrder;
+import static org.apache.mahout.fpm.disteclat.Utils.readTidLists;
+import static org.apache.mahout.fpm.util.Config.MIN_SUP_KEY;
+import static org.apache.mahout.fpm.util.Config.PREFIX_LENGTH_KEY;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -20,11 +20,11 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
-
-import ua.fim.eclat.util.Item;
-import ua.fim.eclat.util.PrefixItemTIDsReporter;
-import ua.fim.eclat.util.SetReporter;
-import ua.hadoop.util.IntArrayWritable;
+import org.apache.mahout.fpm.eclat.EclatMiner;
+import org.apache.mahout.fpm.eclat.util.Item;
+import org.apache.mahout.fpm.eclat.util.PrefixItemTIDsReporter;
+import org.apache.mahout.fpm.eclat.util.SetReporter;
+import org.apache.mahout.fpm.hadoop.util.IntArrayWritable;
 
 /**
  * This class implements the Mapper for the second MapReduce cycle for Dist-Eclat. It receives a list of singletons for
@@ -79,7 +79,7 @@ public class PrefixComputerMapper extends Mapper<LongWritable,Text,Text,IntArray
     
     // if the prefix length is 1, just report the singletons, otherwise use
     // Eclat to find X-FIs seeds
-    ua.fim.eclat.EclatMiner miner = new ua.fim.eclat.EclatMiner();
+    EclatMiner miner = new EclatMiner();
     SetReporter reporter = new PrefixItemTIDsReporter(context, prefixLength, singletons, orderMap);
     
     miner.setSetReporter(reporter);

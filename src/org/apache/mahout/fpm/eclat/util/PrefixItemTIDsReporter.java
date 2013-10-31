@@ -1,6 +1,6 @@
-package ua.fim.eclat.util;
+package org.apache.mahout.fpm.eclat.util;
 
-import static ua.util.Tools.intersect;
+import static org.apache.mahout.fpm.util.Tools.intersect;
 
 import java.util.Arrays;
 import java.util.List;
@@ -9,8 +9,7 @@ import java.util.Map;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper.Context;
-
-import ua.hadoop.util.IntArrayWritable;
+import org.apache.mahout.fpm.hadoop.util.IntArrayWritable;
 
 //@SuppressWarnings({"rawtypes", "unchecked"})
 public class PrefixItemTIDsReporter implements SetReporter {

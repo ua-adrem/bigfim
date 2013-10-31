@@ -1,6 +1,6 @@
-package ua.fim.eclat;
+package org.apache.mahout.fpm.eclat;
 
-import static ua.fim.configuration.Config.PREFIX_LENGTH_KEY;
+import static org.apache.mahout.fpm.util.Config.PREFIX_LENGTH_KEY;
 
 import java.io.IOException;
 

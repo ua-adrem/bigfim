@@ -1,4 +1,4 @@
-package ua.fim.eclat.util;
+package org.apache.mahout.fpm.eclat.util;
 
 import static org.junit.Assert.assertArrayEquals;
 
@@ -11,7 +11,7 @@ import org.junit.Test;
 
 public class TriePrinterTest {
   
-  private static OutputStream out;
+  private OutputStream out;
   
   @Before
   public void setUp() {
@@ -49,7 +49,7 @@ public class TriePrinterTest {
     assertArrayEquals(expecteds, actuals);
   }
   
-  private static String[] getPrintOut(String str) {
+  private String[] getPrintOut(String str) {
     TriePrinter.printAsSets(str);
     
     return out.toString().split("\n");
