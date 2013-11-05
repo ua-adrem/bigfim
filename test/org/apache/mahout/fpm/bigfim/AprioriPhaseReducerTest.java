@@ -31,17 +31,6 @@ import org.junit.Test;
 public class AprioriPhaseReducerTest {
   
   @Test
-  public void reduce_No_Input() {
-    AprioriPhaseReducer.Context ctx = createMock(Reducer.Context.class);
-    
-    EasyMock.replay(ctx);
-    
-    AprioriPhaseReducer reducer = new AprioriPhaseReducer();
-    
-    EasyMock.verify(ctx);
-  }
-  
-  @Test
   public void reduce_With_Input_Empty_MinSup_1() throws Exception {
     AprioriPhaseReducer.Context ctx = createMock(Reducer.Context.class);
     
@@ -50,7 +39,7 @@ public class AprioriPhaseReducerTest {
     AprioriPhaseReducer reducer = new AprioriPhaseReducer();
     AllTests.setField(reducer, "minSup", 1);
     
-    reducer.reduce(new Text("1"), creatList(new int[] {}), ctx);
+    reducer.reduce(new Text("1"), createList(new int[] {}), ctx);
     
     EasyMock.verify(ctx);
   }
@@ -69,10 +58,10 @@ public class AprioriPhaseReducerTest {
     AprioriPhaseReducer reducer = new AprioriPhaseReducer();
     AllTests.setField(reducer, "minSup", 1);
     
-    reducer.reduce(new Text("1"), creatList(new int[] {1, 2, 3, 4}), ctx);
-    reducer.reduce(new Text("2"), creatList(new int[] {5, 2}), ctx);
-    reducer.reduce(new Text("3"), creatList(new int[] {2, 4, 5}), ctx);
-    reducer.reduce(new Text("4"), creatList(new int[] {1}), ctx);
+    reducer.reduce(new Text("1"), createList(1, 2, 3, 4), ctx);
+    reducer.reduce(new Text("2"), createList(5, 2), ctx);
+    reducer.reduce(new Text("3"), createList(2, 4, 5), ctx);
+    reducer.reduce(new Text("4"), createList(1), ctx);
     
     EasyMock.verify(ctx);
   }
@@ -90,10 +79,10 @@ public class AprioriPhaseReducerTest {
     AprioriPhaseReducer reducer = new AprioriPhaseReducer();
     AllTests.setField(reducer, "minSup", 5);
     
-    reducer.reduce(new Text("1"), creatList(new int[] {1, 2, 3, 4}), ctx);
-    reducer.reduce(new Text("2"), creatList(new int[] {5, 2}), ctx);
-    reducer.reduce(new Text("3"), creatList(new int[] {2, 4, 5}), ctx);
-    reducer.reduce(new Text("4"), creatList(new int[] {1}), ctx);
+    reducer.reduce(new Text("1"), createList(1, 2, 3, 4), ctx);
+    reducer.reduce(new Text("2"), createList(5, 2), ctx);
+    reducer.reduce(new Text("3"), createList(2, 4, 5), ctx);
+    reducer.reduce(new Text("4"), createList(1), ctx);
     
     EasyMock.verify(ctx);
   }
@@ -110,15 +99,15 @@ public class AprioriPhaseReducerTest {
     AprioriPhaseReducer reducer = new AprioriPhaseReducer();
     AllTests.setField(reducer, "minSup", 10);
     
-    reducer.reduce(new Text("1"), creatList(new int[] {1, 2, 3, 4}), ctx);
-    reducer.reduce(new Text("2"), creatList(new int[] {5, 2}), ctx);
-    reducer.reduce(new Text("3"), creatList(new int[] {2, 4, 5}), ctx);
-    reducer.reduce(new Text("4"), creatList(new int[] {1}), ctx);
+    reducer.reduce(new Text("1"), createList(1, 2, 3, 4), ctx);
+    reducer.reduce(new Text("2"), createList(5, 2), ctx);
+    reducer.reduce(new Text("3"), createList(2, 4, 5), ctx);
+    reducer.reduce(new Text("4"), createList(1), ctx);
     
     EasyMock.verify(ctx);
   }
   
-  private Iterable<IntWritable> creatList(int[] is) {
+  private Iterable<IntWritable> createList(int... is) {
     List<IntWritable> list = new LinkedList<IntWritable>();
     for (int i : is) {
       list.add(new IntWritable(i));
