@@ -16,7 +16,7 @@
 	<property name="title" value="BIGFIM" />
 	<property name="software" value="bigfim" />
 	<property name="version" value="0" />
-	<property name="sub-version" value="1" />
+	<property name="sub-version" value="2" />
 	<property name="bugfix-build" value="0" />
 	<property name="fullversion" value="${version}.${sub-version}" />
 
