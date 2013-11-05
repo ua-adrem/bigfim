@@ -23,8 +23,8 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses({FimDriverTest.class, org.apache.mahout.fpm.bigfim.AllTests.class,
-    org.apache.mahout.fpm.eclat.util.AllTests.class})
+@SuiteClasses({org.apache.mahout.fpm.bigfim.AllTests.class, org.apache.mahout.fpm.eclat.util.AllTests.class,
+    org.apache.mahout.fpm.disteclat.DistEclatDriverTest.class})
 public class AllTests {
   
   public static void setField(Object target, String fieldname, Object value) throws NoSuchFieldException,

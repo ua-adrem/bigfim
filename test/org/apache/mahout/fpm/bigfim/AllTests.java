@@ -21,7 +21,7 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses({AprioriPhaseMapperTest.class, AprioriPhaseReducerTest.class})
+@SuiteClasses({AprioriPhaseMapperTest.class, AprioriPhaseReducerTest.class, BigFimDriverTest.class})
 public class AllTests {
   
 }

@@ -23,8 +23,6 @@ import java.io.InputStreamReader;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import org.apache.mahout.fpm.FimDriver.FimVersion;
-
 /**
  * Configuration for Dist-Eclat and BigFIM algorithms
  * 
@@ -79,14 +77,6 @@ public class Config {
     return !getInputFile().equals("") && !getOutputDir().equals("") && (getMinSup() != -1 || getMinFreq() != -1);
   }
   
-  public FimVersion getVersion() {
-    String value = props.getProperty(VERSION, "1");
-    if (value.equals("2") || value.equalsIgnoreCase(FimVersion.BIGFIM.toString())) {
-      return FimVersion.BIGFIM;
-    }
-    return FimVersion.DISTECLAT;
-  }
-  
   public boolean getClosedSetsOptimization() {
     return Boolean.parseBoolean(props.getProperty(CLOSED_SETS_OPTIMIZATION_KEY, "false"));
   }
@@ -123,4 +113,8 @@ public class Config {
     return Boolean.parseBoolean(props.getProperty(WRITE_SETS_KEY, "true"));
   }
   
+  public static void printHelp() {
+    System.out.println("Please specify: [configFile]");
+    System.out.println("For more information on config file please check example folder.");
+  }
 }

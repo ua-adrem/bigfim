@@ -109,6 +109,7 @@ public class DistEclatDriver extends Configured implements Tool {
     }
     if (!config.isValid()) {
       System.out.println("Config file is invalid!");
+      Config.printHelp();
       return -1;
     }
     config.printConfig();

@@ -2,7 +2,6 @@
 
 We give an example about how the FIM mining methods work on a synthetic dataset.
 
-
 ## Horizontal Transaction Database
 
 _sample.dat_ is a _horizontal transaction database_. Each number represents
@@ -22,8 +21,8 @@ _sample-tids.dat_ is a vertical transaction database.
 ## Configuring the Parameters
 
 The methods accept the parameters as a configuration file. Config file is a
-standart properties files, which include key value pairs at each line.
-Parameters are explained in detail in the example configuration files.
+standart properties file, which include key value pairs at each line. Parameters
+are explained in detail in the example configuration files.
 
 ## Running the miner
 
@@ -33,7 +32,7 @@ setup hadoop platform.
 Make sure that you have the database in both formats:
 
     cd example
-    java -cp ../bigfim.0.1.jar ua.util.DbTransposer sample.dat
+    java -cp ../bigfim-*.jar org.apache.mahout.fpm.DbTransposer sample.dat
 
 Put the datafiles in to HDFS:
 
@@ -43,7 +42,7 @@ Put the datafiles in to HDFS:
     
 Run the dist-eclat miner:
     
-    $HADOOP_PREFIX/bin/hadoop jar ../bigfim.0.1.jar config-sample-Dist-Eclat.properties
+    $HADOOP_PREFIX/bin/hadoop jar ../bigfim-*.jar org.apache.mahout.fpm.disteclat.DistEclatDriver config-sample-Dist-Eclat.properties
    
 It will run for a while. Get the frequent itemsets:
 
@@ -54,7 +53,7 @@ Please note that the file is encoded for compression. To decode the file and
 write all the individual frequent itemsets to `/tmp/out.txt` use the following 
 command:
 
-    java -cp ../bigfim.0.1.jar ua.fim.disteclat.util.TriePrinter output/sample-60-3/fis/part-r-00000 /tmp/out.txt
+    java -cp ../bigfim-*.jar org.apache.mahout.fpm.disteclat.util.TriePrinter output/sample-60-3/fis/part-r-00000 /tmp/out.txt
  
 For the format of the output please refer to the project [wiki][wiki].
 
@@ -74,7 +73,7 @@ commands to download the dataset and uncompress it:
 To convert the _horizontal_ database to _vertical_ database, use the following
 command:
 
-    java -cp ../bigfim.0.1.jar ua.util.DbTransposer sample.dat
+    java -cp ../bigfim-*.jar org.apache.mahout.fpm.util.DbTransposer sample.dat
    
 It will create a file called _mushroom-tids.dat_ in the same folder. You can 
 provide this file to Dist-Eclat. Config files for _mushroom_ dataset is provided 

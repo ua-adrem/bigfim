@@ -49,7 +49,6 @@
 		<mkdir dir="${dist}" />
 		<jar jarfile="${software}-${fullversion}.jar" basedir="${build}">
 			<manifest>
-				<attribute name="Main-Class" value="${mainClass}" />
 				<attribute name="Version-Title" value="${title}" />
 				<attribute name="Specification-Version" value="${version}.${sub-version}" />
 				<attribute name="Implementation-Title" value="${title}" />

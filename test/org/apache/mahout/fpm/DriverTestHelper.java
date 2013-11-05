@@ -29,55 +29,17 @@ import java.util.Scanner;
 import java.util.Set;
 
 import org.apache.mahout.fpm.eclat.util.TriePrinter;
-import org.junit.Before;
-import org.junit.Test;
 
-public class FimDriverTest {
-  
-  private static final String Dist_Eclat_Output_File = "output/sample-60-3/fis/part-r-00000";
-  private static final String Dist_Eclat_Config_File = "example/config-sample-Dist-Eclat.properties";
-  private static final String BigFim_Output_File = "output/sample-bf-60-2/fis/part-r-00000";
-  private static final String BigFim_Config_File = "example/config-sample-BigFim.properties";
+public class DriverTestHelper {
   
   static int[][] Expecteds = new int[][] { {12, 19, 18, 14}, {15, 19, 14, 18}, {15, 12, 14, 18}, {6, 19, 18, 14}};
   private List<Set<Integer>> expecteds;
-  private static boolean distEclatHasRun = false;
-  private static boolean bigFimHasRun = false;
   
-  @Before
-  public void setUp() {
+  public DriverTestHelper() {
     expecteds = prepareExpecteds();
   }
   
-  @Test
-  public void Dist_Eclat_Finds_Frequent_Itemsets() throws Exception {
-    
-    runDistEclatOnce();
-    assertAllOfThemFrequent(readResults(Dist_Eclat_Output_File));
-  }
-  
-  @Test
-  public void Dist_Eclat_Finds_All_The_Closed_Frequent_Itemsets() throws Exception {
-    
-    runDistEclatOnce();
-    assertAllFrequentsAreFound(readResults(Dist_Eclat_Output_File));
-  }
-  
-  @Test
-  public void BigFim_Finds_Frequent_Itemsets() throws Exception {
-    
-    runBigFimOnce();
-    assertAllOfThemFrequent(readResults(BigFim_Output_File));
-  }
-  
-  @Test
-  public void BigFim_Finds_All_The_Closed_Frequent_Itemsets() throws Exception {
-    
-    runBigFimOnce();
-    assertAllFrequentsAreFound(readResults(BigFim_Output_File));
-  }
-  
-  private void assertAllFrequentsAreFound(List<Set<Integer>> actuals) {
+  public void assertAllFrequentsAreFound(List<Set<Integer>> actuals) {
     nextExpected: for (Iterator<Set<Integer>> expIt = expecteds.iterator(); expIt.hasNext();) {
       Set<Integer> expected = expIt.next();
       
@@ -94,7 +56,7 @@ public class FimDriverTest {
     }
   }
   
-  private void assertAllOfThemFrequent(List<Set<Integer>> actuals) {
+  public void assertAllOfThemFrequent(List<Set<Integer>> actuals) {
     for (Set<Integer> expected : expecteds) {
       for (Iterator<Set<Integer>> it = actuals.iterator(); it.hasNext();) {
         Set<Integer> actual = it.next();
@@ -111,43 +73,7 @@ public class FimDriverTest {
     }
   }
   
-  private static void runDistEclatOnce() {
-    if (!distEclatHasRun) {
-      try {
-        delete(new File(Dist_Eclat_Output_File));
-        runMiner(Dist_Eclat_Config_File);
-      } catch (Exception e) {
-        throw new IllegalStateException(e);
-      }
-    }
-    distEclatHasRun = true;
-  }
-  
-  private static void runBigFimOnce() {
-    if (!bigFimHasRun) {
-      try {
-        delete(new File(BigFim_Output_File));
-        runMiner(BigFim_Config_File);
-      } catch (Exception e) {
-        throw new IllegalStateException(e);
-      }
-    }
-    bigFimHasRun = true;
-  }
-  
-  private static List<Set<Integer>> prepareExpecteds() {
-    List<Set<Integer>> expectedsList = new ArrayList<Set<Integer>>(Expecteds.length);
-    for (int[] expected : Expecteds) {
-      Set<Integer> e = new HashSet<Integer>();
-      for (int i : expected) {
-        e.add(i);
-      }
-      expectedsList.add(e);
-    }
-    return expectedsList;
-  }
-  
-  private static List<Set<Integer>> readResults(final String outputFile) throws IOException, FileNotFoundException {
+  public static List<Set<Integer>> readResults(final String outputFile) throws IOException, FileNotFoundException {
     File tempFile = File.createTempFile("fis", ".txt");
     tempFile.deleteOnExit();
     TriePrinter.main(new String[] {outputFile, tempFile.getAbsolutePath()});
@@ -185,16 +111,24 @@ public class FimDriverTest {
     return actuals;
   }
   
-  private static void runMiner(final String configFile) throws Exception {
-    FimDriver.main(new String[] {configFile});
-  }
-  
-  private static void delete(File file) {
+  public static void delete(File file) {
     if (file.isDirectory()) {
       for (File f : file.listFiles()) {
         delete(f);
       }
     }
     file.delete();
+  }
+
+  private static List<Set<Integer>> prepareExpecteds() {
+    List<Set<Integer>> expectedsList = new ArrayList<Set<Integer>>(Expecteds.length);
+    for (int[] expected : Expecteds) {
+      Set<Integer> e = new HashSet<Integer>();
+      for (int i : expected) {
+        e.add(i);
+      }
+      expectedsList.add(e);
+    }
+    return expectedsList;
   }
 }
